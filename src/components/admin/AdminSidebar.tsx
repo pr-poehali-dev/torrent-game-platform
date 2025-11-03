@@ -69,24 +69,26 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
         </button>
 
         <button
-          onClick={() => setActiveTab('functions')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            activeTab === 'functions' 
-              ? 'bg-primary text-primary-foreground' 
-              : 'hover:bg-secondary'
-          }`}
-        >
-          <Icon name="FolderPlus" size={20} />
-          <span className="font-medium">Добавить категорию</span>
-        </button>
-
-        <button
           onClick={() => navigate("/")}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-secondary"
         >
           <Icon name="Home" size={20} />
           <span className="font-medium">На главную</span>
         </button>
+
+        <div className="mt-4 pt-4 border-t border-border">
+          <button
+            onClick={() => setActiveTab('functions')}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              activeTab === 'functions' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-secondary'
+            }`}
+          >
+            <Icon name="FolderPlus" size={16} />
+            <span className="text-sm">Добавить категорию</span>
+          </button>
+        </div>
       </nav>
 
       <div className="absolute bottom-0 w-64 p-4 border-t border-border bg-card/50">
