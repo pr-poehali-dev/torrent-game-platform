@@ -13,9 +13,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
     path_params = event.get('pathParams', {})
     action = path_params.get('proxy', '')
-    request_context = event.get('requestContext', {})
-    path = request_context.get('path', '')
-    print(f"DEBUG: method={method}, action={action}, path={path}, path_params={path_params}, event_keys={list(event.keys())}")
+    
+    url = event.get('url', '')
+    if url:
+        url_parts = url.strip('/').split('/')
+        if len(url_parts) > 0 and url_parts[-1] and url_parts[-1] not in ['stats', 'users']:
+            action = url_parts[-1]
+    
+    print(f"DEBUG: method={method}, action={action}, url={url}, path_params={path_params}")
     
     if method == 'OPTIONS':
         return {
