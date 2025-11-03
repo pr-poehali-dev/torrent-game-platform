@@ -42,11 +42,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         if action == 'categories' and method == 'GET':
-            cur.execute("SELECT id, name, slug FROM categories ORDER BY name")
+            cur.execute("SELECT id, name, slug FROM t_p88186320_torrent_game_platfor.categories ORDER BY name")
             rows = cur.fetchall()
             categories = []
             for row in rows:
-                cur.execute("SELECT COUNT(*) FROM torrents WHERE category = %s", (row[2],))
+                cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.torrents WHERE category = %s", (row[2],))
                 count = cur.fetchone()[0]
                 categories.append({
                     'id': row[0],
@@ -71,7 +71,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             slug = body_data.get('slug')
             
             cur.execute(
-                "INSERT INTO categories (name, slug) VALUES (%s, %s) RETURNING id",
+                "INSERT INTO t_p88186320_torrent_game_platfor.categories (name, slug) VALUES (%s, %s) RETURNING id",
                 (name, slug)
             )
             category_id = cur.fetchone()[0]
@@ -89,7 +89,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif action.startswith('categories/') and method == 'DELETE':
             category_id = action.split('/')[-1]
-            cur.execute("DELETE FROM categories WHERE id = %s", (category_id,))
+            cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.categories WHERE id = %s", (category_id,))
             conn.commit()
             
             return {
