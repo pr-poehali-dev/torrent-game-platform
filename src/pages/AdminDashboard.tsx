@@ -43,22 +43,55 @@ const AdminDashboard = () => {
     navigate("/admin");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    toast({
-      title: "Торрент добавлен",
-      description: `"${formData.title}" успешно добавлен в каталог`,
-    });
-    
-    setFormData({
-      title: "",
-      poster: "",
-      downloads: "",
-      size: "",
-      category: "",
-      description: "",
-    });
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          poster: formData.poster,
+          downloads: parseInt(formData.downloads),
+          size: parseFloat(formData.size),
+          category: formData.category,
+          description: formData.description,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Торрент добавлен",
+          description: `"${formData.title}" успешно добавлен в базу данных`,
+        });
+        
+        setFormData({
+          title: "",
+          poster: "",
+          downloads: "",
+          size: "",
+          category: "",
+          description: "",
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: data.message || "Не удалось добавить торрент",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка сети",
+        description: "Проверьте подключение к интернету",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleChange = (field: string, value: string) => {

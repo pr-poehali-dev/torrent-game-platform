@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,41 +18,55 @@ interface TorrentCard {
   poster: string;
   downloads: number;
   size: number;
+  category: string;
+  description: string;
 }
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [allTorrents, setAllTorrents] = useState<TorrentCard[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTorrents();
+  }, []);
+
+  const fetchTorrents = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae');
+      const data = await response.json();
+      setAllTorrents(data.torrents || []);
+    } catch (error) {
+      console.error('Ошибка загрузки торрентов:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const stats = {
-    games: "12,847",
+    games: allTorrents.length.toLocaleString('ru-RU'),
     users: "342,891",
     comments: "1,234,567"
   };
 
-  const popularTorrents: TorrentCard[] = [
-    { id: 1, title: "Cyberpunk 2077", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 245890, size: 57.3 },
-    { id: 2, title: "Elden Ring", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 189456, size: 48.2 },
-    { id: 3, title: "Red Dead Redemption 2", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 167234, size: 112.4 },
-    { id: 4, title: "God of War", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 156789, size: 67.9 },
-  ];
-
-  const steamDeckGames: TorrentCard[] = [
-    { id: 5, title: "Hades", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 98765, size: 15.6 },
-    { id: 6, title: "Vampire Survivors", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 87654, size: 0.8 },
-    { id: 7, title: "Stardew Valley", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 76543, size: 1.2 },
-    { id: 8, title: "Dead Cells", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 65432, size: 2.3 },
-  ];
-
-  const networkGames: TorrentCard[] = [
-    { id: 9, title: "Counter-Strike 2", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 198765, size: 28.5 },
-    { id: 10, title: "Rust", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 145678, size: 23.7 },
-    { id: 11, title: "Valheim", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 123456, size: 4.2 },
-    { id: 12, title: "ARK: Survival Evolved", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 112345, size: 89.3 },
-  ];
+  const popularTorrents = allTorrents.slice(0, 4);
+  const steamDeckGames = allTorrents.filter(t => t.category === 'indie').slice(0, 4);
+  const networkGames = allTorrents.filter(t => t.category === 'multiplayer').slice(0, 4);
 
   const formatDownloads = (num: number) => {
     return num.toLocaleString('ru-RU');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Icon name="Loader2" className="animate-spin text-primary mx-auto mb-4" size={48} />
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
