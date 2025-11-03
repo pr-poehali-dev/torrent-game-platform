@@ -26,9 +26,15 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allTorrents, setAllTorrents] = useState<TorrentCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    games: "0",
+    users: "0",
+    comments: "0"
+  });
 
   useEffect(() => {
     fetchTorrents();
+    fetchStats();
   }, []);
 
   const fetchTorrents = async () => {
@@ -43,10 +49,18 @@ const Index = () => {
     }
   };
 
-  const stats = {
-    games: allTorrents.length.toLocaleString('ru-RU'),
-    users: "342,891",
-    comments: "1,234,567"
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/stats');
+      const data = await response.json();
+      setStats({
+        games: data.games.toLocaleString('ru-RU'),
+        users: data.users.toLocaleString('ru-RU'),
+        comments: data.comments.toLocaleString('ru-RU')
+      });
+    } catch (error) {
+      console.error('Ошибка загрузки статистики:', error);
+    }
   };
 
   const popularTorrents = allTorrents.slice(0, 4);

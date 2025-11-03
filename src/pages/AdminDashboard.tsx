@@ -26,13 +26,33 @@ const AdminDashboard = () => {
     category: "",
     description: "",
   });
+  const [stats, setStats] = useState({
+    games: "0",
+    users: "0",
+    comments: "0"
+  });
 
   useEffect(() => {
     const isAuth = localStorage.getItem("adminAuth");
     if (isAuth !== "true") {
       navigate("/admin");
     }
+    fetchStats();
   }, [navigate]);
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/stats');
+      const data = await response.json();
+      setStats({
+        games: data.games.toLocaleString('ru-RU'),
+        users: data.users.toLocaleString('ru-RU'),
+        comments: data.comments.toLocaleString('ru-RU')
+      });
+    } catch (error) {
+      console.error('Ошибка загрузки статистики:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("adminAuth");
@@ -78,6 +98,8 @@ const AdminDashboard = () => {
           category: "",
           description: "",
         });
+        
+        fetchStats();
       } else {
         toast({
           title: "Ошибка",
@@ -124,7 +146,7 @@ const AdminDashboard = () => {
                   <Icon name="Gamepad2" className="text-primary" size={24} />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">12,847</div>
+                  <div className="text-2xl font-bold">{stats.games}</div>
                   <div className="text-sm text-muted-foreground">Всего игр</div>
                 </div>
               </div>
@@ -137,7 +159,7 @@ const AdminDashboard = () => {
                   <Icon name="Users" className="text-primary" size={24} />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">342,891</div>
+                  <div className="text-2xl font-bold">{stats.users}</div>
                   <div className="text-sm text-muted-foreground">Пользователей</div>
                 </div>
               </div>
@@ -147,11 +169,11 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-primary/10 rounded-lg">
-                  <Icon name="Download" className="text-primary" size={24} />
+                  <Icon name="MessageSquare" className="text-primary" size={24} />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">1.2M</div>
-                  <div className="text-sm text-muted-foreground">Скачиваний</div>
+                  <div className="text-2xl font-bold">{stats.comments}</div>
+                  <div className="text-sm text-muted-foreground">Комментариев</div>
                 </div>
               </div>
             </CardContent>

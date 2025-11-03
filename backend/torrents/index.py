@@ -5,12 +5,14 @@ from typing import Dict, Any
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: API для управления торрентами (получение списка и добавление)
-    Args: event - dict с httpMethod, body, queryStringParameters
+    Business: API для управления торрентами и статистикой (получение списка, добавление, статистика)
+    Args: event - dict с httpMethod, body, queryStringParameters, pathParams
           context - object с request_id, function_name
-    Returns: HTTP response dict с списком торрентов или результатом добавления
+    Returns: HTTP response dict с данными торрентов или статистикой
     '''
     method: str = event.get('httpMethod', 'GET')
+    path_params = event.get('pathParams', {})
+    action = path_params.get('proxy', '')
     
     if method == 'OPTIONS':
         return {
@@ -29,7 +31,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur = conn.cursor()
     
     try:
-        if method == 'GET':
+        if action == 'stats' and method == 'GET':
+            cur.execute("SELECT COUNT(*) FROM torrents")
+            games_count = cur.fetchone()[0]
+            
+            cur.execute("SELECT COUNT(*) FROM users")
+            users_count = cur.fetchone()[0]
+            
+            cur.execute("SELECT COUNT(*) FROM comments")
+            comments_count = cur.fetchone()[0]
+            
+            stats = {
+                'games': games_count,
+                'users': users_count,
+                'comments': comments_count
+            }
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps(stats)
+            }
+        
+        elif method == 'GET':
             category = event.get('queryStringParameters', {}).get('category') if event.get('queryStringParameters') else None
             
             if category:
