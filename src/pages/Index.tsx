@@ -4,6 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 interface TorrentCard {
   id: number;
@@ -55,6 +62,75 @@ const Index = () => {
             <div className="flex items-center gap-8">
               <h1 className="text-2xl font-bold text-primary">TorrTop</h1>
               <nav className="hidden md:flex items-center gap-6">
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="text-sm bg-transparent hover:bg-accent">
+                        Категории
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="grid gap-2 p-4 w-[400px] md:w-[500px] lg:w-[600px] lg:grid-cols-2">
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Gamepad2" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">Экшен</div>
+                              <div className="text-xs text-muted-foreground">Динамичные игры</div>
+                            </div>
+                          </Button>
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Sword" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">RPG</div>
+                              <div className="text-xs text-muted-foreground">Ролевые игры</div>
+                            </div>
+                          </Button>
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Ghost" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">Хоррор</div>
+                              <div className="text-xs text-muted-foreground">Игры ужасов</div>
+                            </div>
+                          </Button>
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Trophy" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">Спорт</div>
+                              <div className="text-xs text-muted-foreground">Спортивные симуляторы</div>
+                            </div>
+                          </Button>
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Rocket" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">Гонки</div>
+                              <div className="text-xs text-muted-foreground">Автосимуляторы</div>
+                            </div>
+                          </Button>
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Brain" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">Стратегия</div>
+                              <div className="text-xs text-muted-foreground">Тактические игры</div>
+                            </div>
+                          </Button>
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Users" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">Мультиплеер</div>
+                              <div className="text-xs text-muted-foreground">Онлайн-игры</div>
+                            </div>
+                          </Button>
+                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3">
+                            <Icon name="Sparkles" size={20} className="text-primary" />
+                            <div className="text-left">
+                              <div className="font-semibold">Инди</div>
+                              <div className="text-xs text-muted-foreground">Независимые проекты</div>
+                            </div>
+                          </Button>
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
                 <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   FAQ
                 </a>
