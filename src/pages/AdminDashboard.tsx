@@ -77,9 +77,17 @@ const AdminDashboard = () => {
 
   const handleDeleteTorrent = async (id: string) => {
     try {
-      const response = await fetch(`https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/${id}`, {
+      console.log('Deleting torrent with id:', id);
+      const url = `https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/${id}`;
+      console.log('DELETE URL:', url);
+      
+      const response = await fetch(url, {
         method: 'DELETE',
       });
+
+      console.log('DELETE response status:', response.status);
+      const responseText = await response.text();
+      console.log('DELETE response:', responseText);
 
       if (response.ok) {
         toast({
@@ -89,9 +97,10 @@ const AdminDashboard = () => {
         fetchTorrents();
         fetchStats();
       } else {
-        throw new Error('Failed to delete');
+        throw new Error(`Failed to delete: ${response.status} ${responseText}`);
       }
     } catch (error) {
+      console.error('Delete error:', error);
       toast({
         title: "Ошибка",
         description: "Не удалось удалить торрент",
