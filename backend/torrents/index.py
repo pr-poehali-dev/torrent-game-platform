@@ -41,7 +41,68 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur = conn.cursor()
     
     try:
-        if action == 'stats' and method == 'GET':
+        if action == 'categories' and method == 'GET':
+            cur.execute("SELECT id, name, slug FROM categories ORDER BY name")
+            rows = cur.fetchall()
+            categories = []
+            for row in rows:
+                cur.execute("SELECT COUNT(*) FROM torrents WHERE category = %s", (row[2],))
+                count = cur.fetchone()[0]
+                categories.append({
+                    'id': row[0],
+                    'name': row[1],
+                    'slug': row[2],
+                    'count': count
+                })
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({'categories': categories})
+            }
+        
+        elif action == 'categories' and method == 'POST':
+            body_data = json.loads(event.get('body', '{}'))
+            name = body_data.get('name')
+            slug = body_data.get('slug')
+            
+            cur.execute(
+                "INSERT INTO categories (name, slug) VALUES (%s, %s) RETURNING id",
+                (name, slug)
+            )
+            category_id = cur.fetchone()[0]
+            conn.commit()
+            
+            return {
+                'statusCode': 201,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({'success': True, 'id': category_id, 'message': 'Категория добавлена'})
+            }
+        
+        elif action.startswith('categories/') and method == 'DELETE':
+            category_id = action.split('/')[-1]
+            cur.execute("DELETE FROM categories WHERE id = %s", (category_id,))
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({'success': True, 'message': 'Категория удалена'})
+            }
+        
+        elif action == 'stats' and method == 'GET':
             cur.execute("SELECT COUNT(*) FROM torrents")
             games_count = cur.fetchone()[0]
             

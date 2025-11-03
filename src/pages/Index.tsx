@@ -25,6 +25,7 @@ interface TorrentCard {
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allTorrents, setAllTorrents] = useState<TorrentCard[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     games: "0",
@@ -35,7 +36,18 @@ const Index = () => {
   useEffect(() => {
     fetchTorrents();
     fetchStats();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories');
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.error('Ошибка загрузки категорий:', error);
+    }
+  };
 
   const fetchTorrents = async () => {
     try {
@@ -98,62 +110,15 @@ const Index = () => {
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
                         <div className="grid gap-2 p-4 w-[400px] md:w-[500px] lg:w-[600px] lg:grid-cols-2">
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Gamepad2" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">Экшен</div>
-                              <div className="text-xs text-muted-foreground">Динамичные игры</div>
-                            </div>
-                          </Button>
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Sword" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">RPG</div>
-                              <div className="text-xs text-muted-foreground">Ролевые игры</div>
-                            </div>
-                          </Button>
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Ghost" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">Хоррор</div>
-                              <div className="text-xs text-muted-foreground">Игры ужасов</div>
-                            </div>
-                          </Button>
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Trophy" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">Спорт</div>
-                              <div className="text-xs text-muted-foreground">Спортивные симуляторы</div>
-                            </div>
-                          </Button>
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Rocket" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">Гонки</div>
-                              <div className="text-xs text-muted-foreground">Автосимуляторы</div>
-                            </div>
-                          </Button>
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Brain" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">Стратегия</div>
-                              <div className="text-xs text-muted-foreground">Тактические игры</div>
-                            </div>
-                          </Button>
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Users" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">Мультиплеер</div>
-                              <div className="text-xs text-muted-foreground">Онлайн-игры</div>
-                            </div>
-                          </Button>
-                          <Button variant="ghost" className="justify-start gap-3 h-auto py-3 group">
-                            <Icon name="Sparkles" size={20} className="text-primary group-hover:text-white transition-colors" />
-                            <div className="text-left">
-                              <div className="font-semibold">Инди</div>
-                              <div className="text-xs text-muted-foreground">Независимые проекты</div>
-                            </div>
-                          </Button>
+                          {categories.map((category) => (
+                            <Button key={category.id} variant="ghost" className="justify-start gap-3 h-auto py-3 group">
+                              <Icon name="FolderOpen" size={20} className="text-primary group-hover:text-white transition-colors" />
+                              <div className="text-left">
+                                <div className="font-semibold">{category.name}</div>
+                                <div className="text-xs text-muted-foreground">{category.count} игр</div>
+                              </div>
+                            </Button>
+                          ))}
                         </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Icon from "@/components/ui/icon";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -14,29 +15,72 @@ import {
 } from "@/components/ui/table";
 
 const AdminFunctions = () => {
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Экшен", slug: "action", count: 3 },
-    { id: 2, name: "RPG", slug: "rpg", count: 2 },
-    { id: 3, name: "Хоррор", slug: "horror", count: 1 },
-    { id: 4, name: "Спорт", slug: "sport", count: 1 },
-    { id: 5, name: "Гонки", slug: "racing", count: 1 },
-    { id: 6, name: "Стратегия", slug: "strategy", count: 1 },
-    { id: 7, name: "Мультиплеер", slug: "multiplayer", count: 1 },
-    { id: 8, name: "Инди", slug: "indie", count: 0 },
-  ]);
+  const { toast } = useToast();
+  const [categories, setCategories] = useState<any[]>([]);
   const [newCategory, setNewCategory] = useState({ name: "", slug: "" });
 
-  const handleAddCategory = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newCategory.name && newCategory.slug) {
-      const newId = Math.max(...categories.map(c => c.id)) + 1;
-      setCategories([...categories, { id: newId, ...newCategory, count: 0 }]);
-      setNewCategory({ name: "", slug: "" });
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories');
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
     }
   };
 
-  const handleDeleteCategory = (id: number) => {
-    setCategories(categories.filter(c => c.id !== id));
+  const handleAddCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newCategory.name && newCategory.slug) {
+      try {
+        const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newCategory)
+        });
+
+        if (response.ok) {
+          toast({
+            title: "Категория добавлена",
+            description: `Категория "${newCategory.name}" успешно добавлена`,
+          });
+          setNewCategory({ name: "", slug: "" });
+          fetchCategories();
+        }
+      } catch (error) {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось добавить категорию",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    try {
+      const response = await fetch(`https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Категория удалена",
+          description: "Категория успешно удалена",
+        });
+        fetchCategories();
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить категорию",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
