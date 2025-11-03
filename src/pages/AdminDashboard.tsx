@@ -30,12 +30,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -270,23 +264,80 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Icon name="Shield" className="text-primary" size={28} />
-              <h1 className="text-2xl font-bold">Админ-панель TorrTop</h1>
+    <div className="min-h-screen bg-background flex">
+      <aside className="w-64 border-r border-border bg-card/50 sticky top-0 h-screen overflow-y-auto">
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center gap-3">
+            <Icon name="Shield" className="text-primary" size={28} />
+            <div>
+              <h1 className="font-bold text-lg">TorrTop</h1>
+              <p className="text-xs text-muted-foreground">Админ-панель</p>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
-              <Icon name="LogOut" size={18} className="mr-2" />
-              Выйти
-            </Button>
           </div>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-8">
+        <nav className="p-4 space-y-2">
+          <button
+            onClick={() => setActiveTab('add')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === 'add' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-secondary'
+            }`}
+          >
+            <Icon name="Plus" size={20} />
+            <span className="font-medium">Добавить торрент</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('torrents')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === 'torrents' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-secondary'
+            }`}
+          >
+            <Icon name="Gamepad2" size={20} />
+            <div className="flex-1 text-left">
+              <span className="font-medium">Торренты</span>
+              <p className="text-xs opacity-70">{torrents.length} игр</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === 'users' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-secondary'
+            }`}
+          >
+            <Icon name="Users" size={20} />
+            <div className="flex-1 text-left">
+              <span className="font-medium">Пользователи</span>
+              <p className="text-xs opacity-70">{users.length} чел.</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => navigate("/")}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-secondary"
+          >
+            <Icon name="Home" size={20} />
+            <span className="font-medium">На главную</span>
+          </button>
+        </nav>
+
+        <div className="absolute bottom-0 w-64 p-4 border-t border-border bg-card/50">
+          <Button variant="outline" onClick={handleLogout} className="w-full">
+            <Icon name="LogOut" size={18} className="mr-2" />
+            Выйти
+          </Button>
+        </div>
+      </aside>
+
+      <main className="flex-1 overflow-y-auto">
+        <div className="container mx-auto px-8 py-8">
         <div className="grid gap-6 md:grid-cols-3 mb-8">
           <Card className="bg-gradient-to-br from-card to-secondary border-border">
             <CardContent className="p-6">
@@ -329,23 +380,8 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="add">
-              <Icon name="Plus" size={18} className="mr-2" />
-              Добавить
-            </TabsTrigger>
-            <TabsTrigger value="torrents">
-              <Icon name="Gamepad2" size={18} className="mr-2" />
-              Торренты ({torrents.length})
-            </TabsTrigger>
-            <TabsTrigger value="users">
-              <Icon name="Users" size={18} className="mr-2" />
-              Пользователи ({users.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="add">
+        <div className="w-full">
+          {activeTab === 'add' && (
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -446,17 +482,13 @@ const AdminDashboard = () => {
                   <Icon name="Plus" size={18} className="mr-2" />
                   Добавить торрент
                 </Button>
-                <Button type="button" variant="outline" onClick={() => navigate("/")}>
-                  <Icon name="Home" size={18} className="mr-2" />
-                  На главную
-                </Button>
               </div>
             </form>
           </CardContent>
         </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="torrents">
+          {activeTab === 'torrents' && (
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -611,9 +643,9 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="users">
+          {activeTab === 'users' && (
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -660,8 +692,8 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
 
         <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
           <AlertDialogContent>
@@ -693,6 +725,7 @@ const AdminDashboard = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        </div>
       </main>
     </div>
   );
