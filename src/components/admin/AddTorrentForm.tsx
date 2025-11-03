@@ -16,7 +16,6 @@ interface AddTorrentFormProps {
   formData: {
     title: string;
     poster: string;
-    downloads: string;
     size: string;
     category: string;
     description: string;
@@ -91,19 +90,6 @@ const AddTorrentForm = ({ formData, onSubmit, onChange }: AddTorrentFormProps) =
                 placeholder="57.3"
                 value={formData.size}
                 onChange={(e) => onChange("size", e.target.value)}
-                className="bg-secondary border-border"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="downloads">Скачивания</Label>
-              <Input
-                id="downloads"
-                type="number"
-                placeholder="245890"
-                value={formData.downloads}
-                onChange={(e) => onChange("downloads", e.target.value)}
                 className="bg-secondary border-border"
                 required
               />

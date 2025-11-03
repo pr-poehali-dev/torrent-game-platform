@@ -15,7 +15,6 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState({
     title: "",
     poster: "",
-    downloads: "",
     size: "",
     category: "",
     description: "",
