@@ -20,11 +20,12 @@ interface AddTorrentFormProps {
     category: string;
     description: string;
   };
+  categories: Array<{ id: number; name: string; slug: string }>;
   onSubmit: (e: React.FormEvent) => void;
   onChange: (field: string, value: string) => void;
 }
 
-const AddTorrentForm = ({ formData, onSubmit, onChange }: AddTorrentFormProps) => {
+const AddTorrentForm = ({ formData, categories, onSubmit, onChange }: AddTorrentFormProps) => {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
@@ -56,14 +57,11 @@ const AddTorrentForm = ({ formData, onSubmit, onChange }: AddTorrentFormProps) =
                   <SelectValue placeholder="Выберите категорию" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="action">Экшен</SelectItem>
-                  <SelectItem value="rpg">RPG</SelectItem>
-                  <SelectItem value="horror">Хоррор</SelectItem>
-                  <SelectItem value="sport">Спорт</SelectItem>
-                  <SelectItem value="racing">Гонки</SelectItem>
-                  <SelectItem value="strategy">Стратегия</SelectItem>
-                  <SelectItem value="multiplayer">Мультиплеер</SelectItem>
-                  <SelectItem value="indie">Инди</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.slug}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

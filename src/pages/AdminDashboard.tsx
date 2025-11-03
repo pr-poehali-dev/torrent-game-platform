@@ -26,6 +26,7 @@ const AdminDashboard = () => {
   });
   const [torrents, setTorrents] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [editingTorrent, setEditingTorrent] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteType, setDeleteType] = useState<'torrent' | 'user'>('torrent');
@@ -39,6 +40,7 @@ const AdminDashboard = () => {
     fetchStats();
     fetchTorrents();
     fetchUsers();
+    fetchCategories();
   }, [navigate]);
 
   const fetchStats = async () => {
@@ -72,6 +74,16 @@ const AdminDashboard = () => {
       setUsers(data.users || []);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories');
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
     }
   };
 
@@ -186,7 +198,6 @@ const AdminDashboard = () => {
         body: JSON.stringify({
           title: formData.title,
           poster: formData.poster,
-          downloads: parseInt(formData.downloads),
           size: parseFloat(formData.size),
           category: formData.category,
           description: formData.description,
@@ -204,7 +215,6 @@ const AdminDashboard = () => {
         setFormData({
           title: "",
           poster: "",
-          downloads: "",
           size: "",
           category: "",
           description: "",
@@ -269,6 +279,7 @@ const AdminDashboard = () => {
             {activeTab === 'add' && (
               <AddTorrentForm 
                 formData={formData}
+                categories={categories}
                 onSubmit={handleSubmit}
                 onChange={handleChange}
               />
