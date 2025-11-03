@@ -10,6 +10,7 @@ interface TorrentCard {
   title: string;
   poster: string;
   downloads: number;
+  size: number;
 }
 
 const Index = () => {
@@ -22,24 +23,24 @@ const Index = () => {
   };
 
   const popularTorrents: TorrentCard[] = [
-    { id: 1, title: "Cyberpunk 2077", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 245890 },
-    { id: 2, title: "Elden Ring", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 189456 },
-    { id: 3, title: "Red Dead Redemption 2", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 167234 },
-    { id: 4, title: "God of War", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 156789 },
+    { id: 1, title: "Cyberpunk 2077", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 245890, size: 57.3 },
+    { id: 2, title: "Elden Ring", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 189456, size: 48.2 },
+    { id: 3, title: "Red Dead Redemption 2", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 167234, size: 112.4 },
+    { id: 4, title: "God of War", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 156789, size: 67.9 },
   ];
 
   const steamDeckGames: TorrentCard[] = [
-    { id: 5, title: "Hades", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 98765 },
-    { id: 6, title: "Vampire Survivors", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 87654 },
-    { id: 7, title: "Stardew Valley", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 76543 },
-    { id: 8, title: "Dead Cells", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 65432 },
+    { id: 5, title: "Hades", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 98765, size: 15.6 },
+    { id: 6, title: "Vampire Survivors", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 87654, size: 0.8 },
+    { id: 7, title: "Stardew Valley", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 76543, size: 1.2 },
+    { id: 8, title: "Dead Cells", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 65432, size: 2.3 },
   ];
 
   const networkGames: TorrentCard[] = [
-    { id: 9, title: "Counter-Strike 2", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 198765 },
-    { id: 10, title: "Rust", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 145678 },
-    { id: 11, title: "Valheim", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 123456 },
-    { id: 12, title: "ARK: Survival Evolved", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 112345 },
+    { id: 9, title: "Counter-Strike 2", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 198765, size: 28.5 },
+    { id: 10, title: "Rust", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/652b4c17-c5df-45d1-b06c-7f98c76eeae7.jpg", downloads: 145678, size: 23.7 },
+    { id: 11, title: "Valheim", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/9395dda1-6d14-4170-ba88-042d162df52c.jpg", downloads: 123456, size: 4.2 },
+    { id: 12, title: "ARK: Survival Evolved", poster: "https://cdn.poehali.dev/projects/1d1921d0-74be-4a28-add5-def6ede04b63/files/59db34d0-9bce-4ff7-a5f5-4c98c1030e32.jpg", downloads: 112345, size: 89.3 },
   ];
 
   const formatDownloads = (num: number) => {
@@ -149,12 +150,15 @@ const Index = () => {
                 key={torrent.id} 
                 className="group bg-card border-border overflow-hidden hover:border-primary transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <div className="aspect-[3/4] overflow-hidden">
+                <div className="aspect-[3/4] overflow-hidden relative">
                   <img 
                     src={torrent.poster} 
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
+                  <Badge className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/90 backdrop-blur-sm">
+                    {torrent.size} ГБ
+                  </Badge>
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
@@ -180,12 +184,15 @@ const Index = () => {
                 key={torrent.id} 
                 className="group bg-card border-border overflow-hidden hover:border-primary transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <div className="aspect-[3/4] overflow-hidden">
+                <div className="aspect-[3/4] overflow-hidden relative">
                   <img 
                     src={torrent.poster} 
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
+                  <Badge className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/90 backdrop-blur-sm">
+                    {torrent.size} ГБ
+                  </Badge>
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
@@ -210,12 +217,15 @@ const Index = () => {
                 key={torrent.id} 
                 className="group bg-card border-border overflow-hidden hover:border-primary transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <div className="aspect-[3/4] overflow-hidden">
+                <div className="aspect-[3/4] overflow-hidden relative">
                   <img 
                     src={torrent.poster} 
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
+                  <Badge className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/90 backdrop-blur-sm">
+                    {torrent.size} ГБ
+                  </Badge>
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
