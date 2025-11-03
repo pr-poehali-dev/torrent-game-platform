@@ -18,7 +18,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     url = event.get('url', '')
     if url:
         url_parts = url.strip('/').split('/')
-        if len(url_parts) > 0 and url_parts[-1] and url_parts[-1] not in ['stats', 'users']:
+        if len(url_parts) > 0 and url_parts[-1]:
             action = url_parts[-1]
     
     print(f"DEBUG: method={method}, action={action}, url={url}, query_params={query_params}")
