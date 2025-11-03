@@ -309,16 +309,16 @@ const Index = () => {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-card mt-16">
-        <div className="container mx-auto px-4 py-6">
-          <nav className="flex flex-wrap items-center justify-center gap-6 mb-4">
+      <footer className="border-t border-border bg-card mt-16 mb-0">
+        <div className="container mx-auto px-4 py-4">
+          <nav className="flex flex-wrap items-center justify-center gap-4 mb-3">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               FAQ
             </a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Правообладателям
             </a>
-            <a href="https://t.me/yourusername" className="text-sm text-primary hover:text-primary/80 transition-colors font-medium">
+            <a href="https://t.me/yourusername" className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors">
               Связь с создателем
             </a>
           </nav>
