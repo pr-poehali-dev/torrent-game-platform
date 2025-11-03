@@ -118,6 +118,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Missing id parameter'})
                 }
             
+            cur.execute("DELETE FROM comments WHERE torrent_id = %s", (torrent_id,))
             cur.execute("DELETE FROM torrents WHERE id = %s", (torrent_id,))
             conn.commit()
             
