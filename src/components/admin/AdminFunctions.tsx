@@ -25,7 +25,7 @@ const AdminFunctions = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories');
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories');
       const data = await response.json();
       setCategories(data.categories || []);
     } catch (error) {
@@ -37,7 +37,7 @@ const AdminFunctions = () => {
     e.preventDefault();
     if (newCategory.name && newCategory.slug) {
       try {
-        const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories', {
+        const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newCategory)
@@ -63,7 +63,7 @@ const AdminFunctions = () => {
 
   const handleDeleteCategory = async (id: number) => {
     try {
-      const response = await fetch(`https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/categories/${id}`, {
+      const response = await fetch(`https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories&id=${id}`, {
         method: 'DELETE',
       });
 

@@ -13,7 +13,7 @@
     {
       "name": "Get stats",
       "method": "GET",
-      "path": "/stats",
+      "path": "/?action=stats",
       "expectedStatus": 200,
       "expectedBody": {
         "games": "number",
@@ -23,12 +23,12 @@
       "bodyMatcher": "partial"
     },
     {
-      "name": "Get users list",
+      "name": "Get categories",
       "method": "GET",
-      "path": "/users",
+      "path": "/?action=categories",
       "expectedStatus": 200,
       "expectedBody": {
-        "users": "array"
+        "categories": "array"
       },
       "bodyMatcher": "partial"
     }

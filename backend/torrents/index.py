@@ -11,17 +11,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     Returns: HTTP response dict с данными торрентов или статистикой
     '''
     method: str = event.get('httpMethod', 'GET')
-    path_params = event.get('pathParams', {})
     query_params = event.get('queryStringParameters', {}) or {}
-    action = path_params.get('proxy', '')
     
-    url = event.get('url', '')
-    if url:
-        url_parts = url.strip('/').split('/')
-        if len(url_parts) > 0 and url_parts[-1]:
-            action = url_parts[-1]
+    action = query_params.get('action', '')
     
-    print(f"DEBUG: method={method}, action={action}, url={url}, query_params={query_params}")
+    print(f"DEBUG: method={method}, action={action}, query_params={query_params}")
     
     if method == 'OPTIONS':
         return {
@@ -87,20 +81,31 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'success': True, 'id': category_id, 'message': 'Категория добавлена'})
             }
         
-        elif action.startswith('categories/') and method == 'DELETE':
-            category_id = action.split('/')[-1]
-            cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.categories WHERE id = %s", (category_id,))
-            conn.commit()
-            
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'isBase64Encoded': False,
-                'body': json.dumps({'success': True, 'message': 'Категория удалена'})
-            }
+        elif action == 'categories' and method == 'DELETE':
+            category_id = query_params.get('id')
+            if category_id:
+                cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.categories WHERE id = %s", (category_id,))
+                conn.commit()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'success': True, 'message': 'Категория удалена'})
+                }
+            else:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'error': 'Missing id parameter'})
+                }
         
         elif action == 'stats' and method == 'GET':
             cur.execute("SELECT COUNT(*) FROM torrents")
