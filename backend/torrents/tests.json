@@ -11,21 +11,24 @@
       "bodyMatcher": "partial"
     },
     {
-      "name": "Add new torrent",
-      "method": "POST",
-      "path": "/",
-      "body": {
-        "title": "Test Game",
-        "poster": "https://example.com/poster.jpg",
-        "downloads": 1000,
-        "size": 25.5,
-        "category": "action",
-        "description": "Test description"
-      },
-      "expectedStatus": 201,
+      "name": "Get stats",
+      "method": "GET",
+      "path": "/stats",
+      "expectedStatus": 200,
       "expectedBody": {
-        "success": true,
-        "message": "string"
+        "games": "number",
+        "users": "number",
+        "comments": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get users list",
+      "method": "GET",
+      "path": "/users",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "users": "array"
       },
       "bodyMatcher": "partial"
     }

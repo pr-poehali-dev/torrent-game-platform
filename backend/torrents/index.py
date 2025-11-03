@@ -13,13 +13,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
     path_params = event.get('pathParams', {})
     action = path_params.get('proxy', '')
+    request_context = event.get('requestContext', {})
+    path = request_context.get('path', '')
+    print(f"DEBUG: method={method}, action={action}, path={path}, path_params={path_params}, event_keys={list(event.keys())}")
     
     if method == 'OPTIONS':
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Access-Control-Max-Age': '86400'
             },
@@ -55,6 +58,86 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 },
                 'isBase64Encoded': False,
                 'body': json.dumps(stats)
+            }
+        
+        elif action.startswith('users/') and method == 'DELETE':
+            user_id = action.split('/')[-1]
+            cur.execute("DELETE FROM comments WHERE user_id = %s", (user_id,))
+            cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({'success': True, 'message': 'Пользователь удален'})
+            }
+        
+        elif action == 'users' and method == 'GET':
+            cur.execute("SELECT id, username, email, created_at FROM users ORDER BY created_at DESC")
+            rows = cur.fetchall()
+            users = []
+            for row in rows:
+                users.append({
+                    'id': row[0],
+                    'username': row[1],
+                    'email': row[2],
+                    'created_at': row[3].isoformat() if row[3] else None
+                })
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({'users': users})
+            }
+        
+        elif action and method == 'DELETE':
+            torrent_id = action
+            cur.execute("DELETE FROM torrents WHERE id = %s", (torrent_id,))
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({'success': True, 'message': 'Торрент удален'})
+            }
+        
+        elif action and method == 'PUT':
+            torrent_id = action
+            body_data = json.loads(event.get('body', '{}'))
+            
+            title = body_data.get('title')
+            poster = body_data.get('poster')
+            downloads = int(body_data.get('downloads', 0))
+            size = float(body_data.get('size'))
+            category = body_data.get('category')
+            description = body_data.get('description', '')
+            
+            cur.execute(
+                "UPDATE torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s WHERE id = %s",
+                (title, poster, downloads, size, category, description, torrent_id)
+            )
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({'success': True, 'message': 'Торрент обновлен'})
             }
         
         elif method == 'GET':
