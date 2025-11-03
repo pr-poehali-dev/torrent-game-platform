@@ -310,27 +310,20 @@ const Index = () => {
       </main>
 
       <footer className="border-t border-border bg-card mt-16">
-        <div className="container mx-auto px-4 py-12">
-          <nav className="flex flex-wrap items-center justify-center gap-6 mb-8">
+        <div className="container mx-auto px-4 py-6">
+          <nav className="flex flex-wrap items-center justify-center gap-6 mb-4">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               FAQ
             </a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Правообладателям
             </a>
+            <a href="https://t.me/yourusername" className="text-sm text-primary hover:text-primary/80 transition-colors font-medium">
+              Связь с создателем
+            </a>
           </nav>
           
-          <div className="text-center text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            <p>
-              Администрация сайта не несёт ответственности за содержание материалов находящихся на ресурсе. 
-              Если вы являетесь правообладателем и хотите полностью или частично убрать свой материал с нашего сайта, 
-              то напишите администрации с ссылками на соответствующие документы. Ваша собственность находилась в 
-              свободном доступе и только поэтому была опубликована на нашем сайте. Сайт некоммерческий, и мы не 
-              имеем возможности проверять все публикации пользователей.
-            </p>
-          </div>
-          
-          <div className="text-center mt-8 text-xs text-muted-foreground">
+          <div className="text-center text-xs text-muted-foreground">
             © 2024 TorrTop. Все права защищены.
           </div>
         </div>
