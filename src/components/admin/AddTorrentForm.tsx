@@ -23,9 +23,11 @@ interface AddTorrentFormProps {
   categories: Array<{ id: number; name: string; slug: string }>;
   onSubmit: (e: React.FormEvent) => void;
   onChange: (field: string, value: string) => void;
+  onFileUpload: (file: File) => void;
+  uploadingPoster: boolean;
 }
 
-const AddTorrentForm = ({ formData, categories, onSubmit, onChange }: AddTorrentFormProps) => {
+const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload, uploadingPoster }: AddTorrentFormProps) => {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
@@ -67,16 +69,33 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange }: AddTorrent
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="poster">URL постера</Label>
-              <Input
-                id="poster"
-                type="url"
-                placeholder="https://example.com/poster.jpg"
-                value={formData.poster}
-                onChange={(e) => onChange("poster", e.target.value)}
-                className="bg-secondary border-border"
-                required
-              />
+              <Label htmlFor="poster">Постер игры</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="poster"
+                  type="url"
+                  placeholder="https://example.com/poster.jpg или загрузите файл"
+                  value={formData.poster}
+                  onChange={(e) => onChange("poster", e.target.value)}
+                  className="bg-secondary border-border flex-1"
+                  required
+                />
+                <label className="cursor-pointer">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) onFileUpload(file);
+                    }}
+                  />
+                  <Button type="button" variant="outline" className="w-full" disabled={uploadingPoster}>
+                    <Icon name={uploadingPoster ? "Loader2" : "Upload"} size={18} className={uploadingPoster ? "mr-2 animate-spin" : "mr-2"} />
+                    {uploadingPoster ? "Загрузка..." : "Загрузить"}
+                  </Button>
+                </label>
+              </div>
             </div>
 
             <div className="space-y-2">

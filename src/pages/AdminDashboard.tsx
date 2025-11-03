@@ -31,6 +31,7 @@ const AdminDashboard = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteType, setDeleteType] = useState<'torrent' | 'user'>('torrent');
   const [activeTab, setActiveTab] = useState('add');
+  const [uploadingPoster, setUploadingPoster] = useState(false);
 
   useEffect(() => {
     const isAuth = localStorage.getItem("adminAuth");
@@ -241,6 +242,38 @@ const AdminDashboard = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleFileUpload = async (file: File) => {
+    setUploadingPoster(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+
+      const response = await fetch('https://api.poehali.dev/upload-image', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFormData(prev => ({ ...prev, poster: data.url }));
+        toast({
+          title: "Постер загружен",
+          description: "Изображение успешно загружено",
+        });
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить изображение",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingPoster(false);
+    }
+  };
+
   const handleTorrentDelete = (id: string) => {
     setDeleteId(id);
     setDeleteType('torrent');
@@ -282,6 +315,8 @@ const AdminDashboard = () => {
                 categories={categories}
                 onSubmit={handleSubmit}
                 onChange={handleChange}
+                onFileUpload={handleFileUpload}
+                uploadingPoster={uploadingPoster}
               />
             )}
 
