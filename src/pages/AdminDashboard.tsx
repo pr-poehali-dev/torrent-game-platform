@@ -7,6 +7,7 @@ import AddTorrentForm from "@/components/admin/AddTorrentForm";
 import TorrentsTable from "@/components/admin/TorrentsTable";
 import UsersTable from "@/components/admin/UsersTable";
 import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog";
+import AdminFunctions from "@/components/admin/AdminFunctions";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -289,6 +290,10 @@ const AdminDashboard = () => {
                 users={users}
                 onDelete={handleUserDelete}
               />
+            )}
+
+            {activeTab === 'functions' && (
+              <AdminFunctions />
             )}
           </div>
 

@@ -69,6 +69,18 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
         </button>
 
         <button
+          onClick={() => setActiveTab('functions')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+            activeTab === 'functions' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'hover:bg-secondary'
+          }`}
+        >
+          <Icon name="Settings" size={20} />
+          <span className="font-medium">Функции администратора</span>
+        </button>
+
+        <button
           onClick={() => navigate("/")}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-secondary"
         >
