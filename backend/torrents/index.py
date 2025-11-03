@@ -12,6 +12,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
     method: str = event.get('httpMethod', 'GET')
     path_params = event.get('pathParams', {})
+    query_params = event.get('queryStringParameters', {}) or {}
     action = path_params.get('proxy', '')
     
     url = event.get('url', '')
@@ -20,7 +21,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if len(url_parts) > 0 and url_parts[-1] and url_parts[-1] not in ['stats', 'users']:
             action = url_parts[-1]
     
-    print(f"DEBUG: method={method}, action={action}, url={url}, path_params={path_params}")
+    print(f"DEBUG: method={method}, action={action}, url={url}, query_params={query_params}")
     
     if method == 'OPTIONS':
         return {
@@ -104,8 +105,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'users': users})
             }
         
-        elif action and method == 'DELETE':
-            torrent_id = action
+        elif method == 'DELETE':
+            torrent_id = query_params.get('id') or action
+            if not torrent_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'error': 'Missing id parameter'})
+                }
+            
             cur.execute("DELETE FROM torrents WHERE id = %s", (torrent_id,))
             conn.commit()
             
