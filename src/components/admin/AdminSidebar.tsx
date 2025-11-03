@@ -76,8 +76,8 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
               : 'hover:bg-secondary'
           }`}
         >
-          <Icon name="Settings" size={20} />
-          <span className="font-medium">Функции администратора</span>
+          <Icon name="FolderPlus" size={20} />
+          <span className="font-medium">Добавить категорию</span>
         </button>
 
         <button
