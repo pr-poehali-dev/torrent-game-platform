@@ -68,39 +68,57 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="poster">Постер игры</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="poster"
-                  type="url"
-                  placeholder="https://example.com/poster.jpg или загрузите файл"
-                  value={formData.poster}
-                  onChange={(e) => onChange("poster", e.target.value)}
-                  className="bg-secondary border-border flex-1"
-                  required
-                />
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    id="poster-upload"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) onFileUpload(file);
-                    }}
-                  />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    disabled={uploadingPoster}
-                    onClick={() => document.getElementById('poster-upload')?.click()}
-                  >
-                    <Icon name={uploadingPoster ? "Loader2" : "Upload"} size={18} className={uploadingPoster ? "mr-2 animate-spin" : "mr-2"} />
-                    {uploadingPoster ? "Загрузка..." : "Загрузить"}
-                  </Button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      id="poster"
+                      type="url"
+                      placeholder="https://example.com/poster.jpg или загрузите файл"
+                      value={formData.poster}
+                      onChange={(e) => onChange("poster", e.target.value)}
+                      className="bg-secondary border-border flex-1"
+                      required
+                    />
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="poster-upload"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) onFileUpload(file);
+                        }}
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        disabled={uploadingPoster}
+                        onClick={() => document.getElementById('poster-upload')?.click()}
+                      >
+                        <Icon name={uploadingPoster ? "Loader2" : "Upload"} size={18} className={uploadingPoster ? "mr-2 animate-spin" : "mr-2"} />
+                        {uploadingPoster ? "Загрузка..." : "Загрузить"}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
+                {formData.poster && (
+                  <div className="flex-shrink-0">
+                    <div className="w-32 h-44 rounded-lg overflow-hidden border-2 border-border bg-secondary">
+                      <img 
+                        src={formData.poster} 
+                        alt="Предпросмотр постера"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://placehold.co/300x400/1a1a1a/666?text=Ошибка';
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
