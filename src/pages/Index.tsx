@@ -128,6 +128,22 @@ const Index = () => {
     return num.toLocaleString('ru-RU');
   };
 
+  const getCategoryIcon = (category: string) => {
+    const icons: Record<string, string> = {
+      action: 'Sword',
+      adventure: 'Map',
+      rpg: 'Wand2',
+      strategy: 'Brain',
+      shooter: 'Target',
+      indie: 'Sparkles',
+      multiplayer: 'Users',
+      sports: 'Trophy',
+      racing: 'Car',
+      simulation: 'Cog'
+    };
+    return icons[category] || 'Folder';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -305,6 +321,7 @@ const Index = () => {
                   />
                   <div className="absolute top-3 right-3 flex flex-col gap-2">
                     <Badge className="bg-primary/90 backdrop-blur-sm">
+                      <Icon name={getCategoryIcon(torrent.category)} size={12} className="mr-1" />
                       {torrent.category}
                     </Badge>
                     {torrent.steamDeck && (
@@ -350,6 +367,7 @@ const Index = () => {
                   />
                   <div className="absolute top-3 right-3 flex flex-col gap-2">
                     <Badge className="bg-primary/90 backdrop-blur-sm">
+                      <Icon name={getCategoryIcon(torrent.category)} size={12} className="mr-1" />
                       {torrent.category}
                     </Badge>
                     {torrent.steamDeck && (
@@ -394,6 +412,7 @@ const Index = () => {
                   />
                   <div className="absolute top-3 right-3 flex flex-col gap-2">
                     <Badge className="bg-primary/90 backdrop-blur-sm">
+                      <Icon name={getCategoryIcon(torrent.category)} size={12} className="mr-1" />
                       {torrent.category}
                     </Badge>
                     {torrent.steamDeck && (
