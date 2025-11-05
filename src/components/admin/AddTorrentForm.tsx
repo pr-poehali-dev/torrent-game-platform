@@ -26,6 +26,8 @@ interface AddTorrentFormProps {
 const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload, uploadingPoster }: AddTorrentFormProps) => {
   const [steamUrl, setSteamUrl] = useState("");
   const [loadingSteam, setLoadingSteam] = useState(false);
+  const [steamScreenshots, setSteamScreenshots] = useState<string[]>([]);
+  const [showScreenshots, setShowScreenshots] = useState(false);
 
   const handleSteamParse = async () => {
     if (!steamUrl.trim()) return;
@@ -46,6 +48,11 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
       onChange("poster", data.headerImage || "");
       onChange("description", data.description || "");
       
+      if (data.screenshots && data.screenshots.length > 0) {
+        setSteamScreenshots(data.screenshots);
+        setShowScreenshots(true);
+      }
+      
       setSteamUrl("");
     } catch (error) {
       console.error('Ошибка загрузки из Steam:', error);
@@ -64,7 +71,7 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-6 p-4 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5">
+        <div className="mb-6 p-4 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5 space-y-4">
           <Label htmlFor="steamUrl" className="text-base font-semibold mb-2 flex items-center gap-2">
             <Icon name="Link" size={18} />
             Автозаполнение из Steam
@@ -97,6 +104,49 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
               {loadingSteam ? "Загрузка..." : "Загрузить"}
             </Button>
           </div>
+
+          {showScreenshots && steamScreenshots.length > 0 && (
+            <div className="space-y-3 pt-3 border-t border-border">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold">
+                  Скриншоты из Steam ({steamScreenshots.length})
+                </Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowScreenshots(false);
+                    setSteamScreenshots([]);
+                  }}
+                >
+                  <Icon name="X" size={16} />
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+                {steamScreenshots.map((screenshot, index) => (
+                  <div
+                    key={index}
+                    className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-all"
+                    onClick={() => onChange("poster", screenshot)}
+                  >
+                    <img
+                      src={screenshot}
+                      alt={`Screenshot ${index + 1}`}
+                      className="w-full h-24 object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Icon name="Check" size={24} className="text-white" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Нажмите на скриншот, чтобы использовать его как постер
+              </p>
+            </div>
+          )}
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6">
