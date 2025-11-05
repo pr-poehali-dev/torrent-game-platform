@@ -47,10 +47,7 @@ const TorrentGrid = ({ torrents, formatDownloads, getCategoryIcon }: TorrentGrid
                 </Badge>
               ))}
               {torrent.steamDeck && (
-                <Badge className="bg-green-500 text-white">
-                  <Icon name="Gamepad2" size={12} className="mr-1" />
-                  Deck
-                </Badge>
+                <Badge className="bg-green-500 text-white">Steam Deck</Badge>
               )}
             </div>
             
