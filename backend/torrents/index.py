@@ -114,13 +114,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.users")
             users_count = cur.fetchone()[0]
             
-            cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.comments")
-            comments_count = cur.fetchone()[0]
-            
             stats = {
                 'games': games_count,
                 'users': users_count,
-                'comments': comments_count
+                'comments': 0
             }
             
             return {
@@ -135,8 +132,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif action.startswith('users/') and method == 'DELETE':
             user_id = action.split('/')[-1]
-            cur.execute("DELETE FROM comments WHERE user_id = %s", (user_id,))
-            cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.users WHERE id = %s", (user_id,))
             conn.commit()
             
             return {
@@ -150,7 +146,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif action == 'users' and method == 'GET':
-            cur.execute("SELECT id, username, email, created_at FROM users ORDER BY created_at DESC")
+            cur.execute("SELECT id, username, email, created_at FROM t_p88186320_torrent_game_platfor.users ORDER BY created_at DESC")
             rows = cur.fetchall()
             users = []
             for row in rows:
@@ -184,8 +180,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Missing id parameter'})
                 }
             
-            cur.execute("DELETE FROM comments WHERE torrent_id = %s", (torrent_id,))
-            cur.execute("DELETE FROM torrents WHERE id = %s", (torrent_id,))
+            cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.torrents WHERE id = %s", (torrent_id,))
             conn.commit()
             
             return {
