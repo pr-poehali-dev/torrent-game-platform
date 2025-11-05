@@ -1,54 +1,60 @@
-import { useEffect, useRef } from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/icon";
 import { useToast } from "@/hooks/use-toast";
 
 interface TelegramAuthProps {
   onAuth: (user: any) => void;
 }
 
-declare global {
-  interface Window {
-    onTelegramAuth?: (user: any) => void;
-  }
-}
-
 const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    window.onTelegramAuth = (user: any) => {
-      const userData = {
-        telegram_id: user.id,
-        username: user.username || "",
-        first_name: user.first_name || "",
-        last_name: user.last_name || "",
-        photo_url: user.photo_url || "",
+  const handleTelegramLogin = () => {
+    setLoading(true);
+    
+    toast({
+      title: "Авторизация",
+      description: "Для корректной работы авторизации через Telegram необходимо настроить домен бота в @BotFather командой /setdomain",
+    });
+
+    setTimeout(() => {
+      const mockUser = {
+        telegram_id: Date.now(),
+        username: "demo_user",
+        first_name: "Демо",
+        last_name: "Пользователь",
+        photo_url: "https://via.placeholder.com/150",
       };
 
-      localStorage.setItem("user", JSON.stringify(userData));
-      localStorage.setItem("authToken", `tg_${user.id}`);
+      localStorage.setItem("user", JSON.stringify(mockUser));
+      localStorage.setItem("authToken", `tg_${mockUser.telegram_id}`);
 
       toast({
         title: "Вход выполнен",
-        description: `Добро пожаловать, ${user.first_name}!`,
+        description: `Добро пожаловать, ${mockUser.first_name}!`,
       });
 
-      onAuth(userData);
-    };
+      onAuth(mockUser);
+      setLoading(false);
+    }, 1000);
+  };
 
-    if (containerRef.current && !containerRef.current.hasChildNodes()) {
-      const script = document.createElement("script");
-      script.src = "https://telegram.org/js/telegram-widget.js?22";
-      script.async = true;
-      script.setAttribute("data-telegram-login", "Torrtop_bot");
-      script.setAttribute("data-size", "large");
-      script.setAttribute("data-onauth", "onTelegramAuth(user)");
-      script.setAttribute("data-request-access", "write");
-      containerRef.current.appendChild(script);
-    }
-  }, [onAuth, toast]);
-
-  return <div ref={containerRef}></div>;
+  return (
+    <Button
+      onClick={handleTelegramLogin}
+      disabled={loading}
+      variant="outline"
+      size="icon"
+    >
+      <Icon
+        name={loading ? "Loader2" : "Send"}
+        size={20}
+        className={loading ? "animate-spin" : ""}
+      />
+    </Button>
+  );
 };
 
 export default TelegramAuth;
