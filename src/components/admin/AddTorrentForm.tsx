@@ -80,21 +80,27 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
                   className="bg-secondary border-border flex-1"
                   required
                 />
-                <label className="cursor-pointer">
-                  <Input
+                <div>
+                  <input
                     type="file"
                     accept="image/*"
+                    id="poster-upload"
                     className="hidden"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) onFileUpload(file);
                     }}
                   />
-                  <Button type="button" variant="outline" className="w-full" disabled={uploadingPoster}>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    disabled={uploadingPoster}
+                    onClick={() => document.getElementById('poster-upload')?.click()}
+                  >
                     <Icon name={uploadingPoster ? "Loader2" : "Upload"} size={18} className={uploadingPoster ? "mr-2 animate-spin" : "mr-2"} />
                     {uploadingPoster ? "Загрузка..." : "Загрузить"}
                   </Button>
-                </label>
+                </div>
               </div>
             </div>
 
