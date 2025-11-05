@@ -4,6 +4,7 @@ import Icon from "@/components/ui/icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
+import AuthModal from "@/components/AuthModal";
 import TorrentGrid from "@/components/TorrentGrid";
 
 interface TorrentCard {
@@ -24,6 +25,7 @@ const Catalog = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const selectedCategories = searchParams.get('categories')?.split(',').filter(Boolean) || [];
   const steamDeckOnly = searchParams.get('steamDeck') === 'true';
@@ -115,8 +117,14 @@ const Catalog = () => {
     <div className="min-h-screen bg-background">
       <Header 
         user={user}
-        handleAuth={handleAuth}
+        onOpenAuth={() => setShowAuthModal(true)}
         handleLogout={handleLogout}
+      />
+      
+      <AuthModal 
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        onAuth={handleAuth}
       />
 
       <main className="container mx-auto px-4 py-8">

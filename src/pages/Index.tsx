@@ -4,6 +4,7 @@ import Icon from "@/components/ui/icon";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
+import AuthModal from "@/components/AuthModal";
 import FilterSection from "@/components/FilterSection";
 import StatsSection from "@/components/StatsSection";
 import TorrentGrid from "@/components/TorrentGrid";
@@ -34,6 +35,7 @@ const Index = () => {
   const [warningMessage, setWarningMessage] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [steamDeckOnly, setSteamDeckOnly] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     fetchTorrents();
@@ -161,8 +163,14 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header 
         user={user}
-        handleAuth={handleAuth}
+        onOpenAuth={() => setShowAuthModal(true)}
         handleLogout={handleLogout}
+      />
+      
+      <AuthModal 
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        onAuth={handleAuth}
       />
 
       <main className="container mx-auto px-4 py-8">

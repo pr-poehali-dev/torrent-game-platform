@@ -1,6 +1,5 @@
 import Icon from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
-import TelegramAuth from "@/components/TelegramAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +10,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface HeaderProps {
   user: any;
-  handleAuth: (userData: any) => void;
+  onOpenAuth: () => void;
   handleLogout: () => void;
 }
 
-const Header = ({ user, handleAuth, handleLogout }: HeaderProps) => {
+const Header = ({ user, onOpenAuth, handleLogout }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-4">
@@ -61,7 +60,10 @@ const Header = ({ user, handleAuth, handleLogout }: HeaderProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <TelegramAuth onAuth={handleAuth} />
+              <Button onClick={onOpenAuth} variant="outline">
+                <Icon name="LogIn" size={18} className="mr-2" />
+                Войти
+              </Button>
             )}
           </div>
         </div>
