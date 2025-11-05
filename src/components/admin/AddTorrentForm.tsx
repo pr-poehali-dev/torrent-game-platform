@@ -3,26 +3,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import Icon from "@/components/ui/icon";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface AddTorrentFormProps {
   formData: {
     title: string;
     poster: string;
     size: string;
-    category: string;
+    category: string[];
     description: string;
+    steamDeck: boolean;
   };
   categories: Array<{ id: number; name: string; slug: string }>;
   onSubmit: (e: React.FormEvent) => void;
-  onChange: (field: string, value: string) => void;
+  onChange: (field: string, value: any) => void;
   onFileUpload: (file: File) => void;
   uploadingPoster: boolean;
 }
@@ -52,20 +47,27 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category">Категория</Label>
-              <Select value={formData.category} onValueChange={(value) => onChange("category", value)}>
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue placeholder="Выберите категорию" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.slug}>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Категории</Label>
+              <div className="border rounded-md p-3 bg-secondary grid grid-cols-2 md:grid-cols-3 gap-2">
+                {categories.map((cat) => (
+                  <div key={cat.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`add-cat-${cat.slug}`}
+                      checked={formData.category.includes(cat.slug)}
+                      onCheckedChange={(checked) => {
+                        const newCategories = checked
+                          ? [...formData.category, cat.slug]
+                          : formData.category.filter((c: string) => c !== cat.slug);
+                        onChange("category", newCategories);
+                      }}
+                    />
+                    <label htmlFor={`add-cat-${cat.slug}`} className="text-sm cursor-pointer">
                       {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -143,6 +145,20 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
                 className="bg-secondary border-border"
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="steamDeck">Steam Deck</Label>
+              <div className="flex items-center space-x-2 h-10">
+                <Checkbox
+                  id="steamDeck"
+                  checked={formData.steamDeck}
+                  onCheckedChange={(checked) => onChange("steamDeck", checked)}
+                />
+                <label htmlFor="steamDeck" className="text-sm cursor-pointer">
+                  Совместимо со Steam Deck
+                </label>
+              </div>
             </div>
           </div>
 

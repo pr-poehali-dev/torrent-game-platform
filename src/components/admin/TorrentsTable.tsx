@@ -31,13 +31,14 @@ import {
 
 interface TorrentsTableProps {
   torrents: any[];
+  categories: any[];
   editingTorrent: any;
   setEditingTorrent: (torrent: any) => void;
   onUpdate: (e: React.FormEvent) => void;
   onDelete: (id: string) => void;
 }
 
-const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, onDelete }: TorrentsTableProps) => {
+const TorrentsTable = ({ torrents, categories, editingTorrent, setEditingTorrent, onUpdate, onDelete }: TorrentsTableProps) => {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
@@ -117,36 +118,23 @@ const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, 
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                   <Label>Категории</Label>
-                                  <div className="border rounded-md p-3 space-y-2">
-                                    {['action', 'rpg', 'horror', 'sport', 'racing', 'strategy', 'multiplayer', 'indie', 'adventure', 'shooter', 'simulation'].map((cat) => {
-                                      const categoryLabels: Record<string, string> = {
-                                        action: 'Экшен',
-                                        rpg: 'RPG',
-                                        horror: 'Хоррор',
-                                        sport: 'Спорт',
-                                        racing: 'Гонки',
-                                        strategy: 'Стратегия',
-                                        multiplayer: 'Мультиплеер',
-                                        indie: 'Инди',
-                                        adventure: 'Приключения',
-                                        shooter: 'Шутер',
-                                        simulation: 'Симулятор'
-                                      };
-                                      const categories = editingTorrent.category || [];
+                                  <div className="border rounded-md p-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+                                    {categories.map((cat) => {
+                                      const selectedCategories = editingTorrent.category || [];
                                       return (
-                                        <div key={cat} className="flex items-center space-x-2">
+                                        <div key={cat.id} className="flex items-center space-x-2">
                                           <Checkbox
-                                            id={`cat-${cat}`}
-                                            checked={categories.includes(cat)}
+                                            id={`cat-${cat.slug}`}
+                                            checked={selectedCategories.includes(cat.slug)}
                                             onCheckedChange={(checked) => {
                                               const newCategories = checked
-                                                ? [...categories, cat]
-                                                : categories.filter((c: string) => c !== cat);
+                                                ? [...selectedCategories, cat.slug]
+                                                : selectedCategories.filter((c: string) => c !== cat.slug);
                                               setEditingTorrent({...editingTorrent, category: newCategories});
                                             }}
                                           />
-                                          <label htmlFor={`cat-${cat}`} className="text-sm cursor-pointer">
-                                            {categoryLabels[cat]}
+                                          <label htmlFor={`cat-${cat.slug}`} className="text-sm cursor-pointer">
+                                            {cat.name}
                                           </label>
                                         </div>
                                       );

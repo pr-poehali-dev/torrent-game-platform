@@ -18,8 +18,9 @@ const AdminDashboard = () => {
     title: "",
     poster: "",
     size: "",
-    category: "",
+    category: [] as string[],
     description: "",
+    steamDeck: false,
   });
   const [stats, setStats] = useState({
     games: "0",
@@ -204,8 +205,9 @@ const AdminDashboard = () => {
           title: formData.title,
           poster: formData.poster,
           size: parseFloat(formData.size),
-          category: formData.category,
+          categories: formData.category,
           description: formData.description,
+          steamDeck: formData.steamDeck,
         }),
       });
 
@@ -221,11 +223,13 @@ const AdminDashboard = () => {
           title: "",
           poster: "",
           size: "",
-          category: "",
+          category: [],
           description: "",
+          steamDeck: false,
         });
         
         fetchStats();
+        fetchTorrents();
       } else {
         toast({
           title: "Ошибка",
@@ -344,6 +348,7 @@ const AdminDashboard = () => {
             {activeTab === 'torrents' && (
               <TorrentsTable 
                 torrents={torrents}
+                categories={categories}
                 editingTorrent={editingTorrent}
                 setEditingTorrent={setEditingTorrent}
                 onUpdate={handleUpdateTorrent}
