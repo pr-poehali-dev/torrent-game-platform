@@ -210,15 +210,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             poster = body_data.get('poster')
             downloads = int(body_data.get('downloads', 0))
             size = float(body_data.get('size'))
-            category = body_data.get('category')
+            categories = body_data.get('categories', [])
             description = body_data.get('description', '')
             steam_deck = body_data.get('steamDeck', False)
             
-            print(f"PUT VALUES: title={title}, steam_deck={steam_deck}")
+            print(f"PUT VALUES: title={title}, steam_deck={steam_deck}, categories={categories}")
             
             cur.execute(
                 "UPDATE t_p88186320_torrent_game_platfor.torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s, steam_deck = %s WHERE id = %s",
-                (title, poster, downloads, size, category, description, steam_deck, torrent_id)
+                (title, poster, downloads, size, categories, description, steam_deck, torrent_id)
             )
             conn.commit()
             
@@ -239,7 +239,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if category:
                 cur.execute(
-                    "SELECT id, title, poster, downloads, size, category, description, steam_deck FROM t_p88186320_torrent_game_platfor.torrents WHERE category = %s ORDER BY downloads DESC",
+                    "SELECT id, title, poster, downloads, size, category, description, steam_deck FROM t_p88186320_torrent_game_platfor.torrents WHERE %s = ANY(category) ORDER BY downloads DESC",
                     (category,)
                 )
             else:
@@ -278,12 +278,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             poster = body_data.get('poster')
             downloads = int(body_data.get('downloads', 0))
             size = float(body_data.get('size'))
-            category = body_data.get('category')
+            categories = body_data.get('categories', [])
             description = body_data.get('description', '')
+            steam_deck = body_data.get('steamDeck', False)
             
             cur.execute(
-                "INSERT INTO torrents (title, poster, downloads, size, category, description) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
-                (title, poster, downloads, size, category, description)
+                "INSERT INTO t_p88186320_torrent_game_platfor.torrents (title, poster, downloads, size, category, description, steam_deck) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id",
+                (title, poster, downloads, size, categories, description, steam_deck)
             )
             torrent_id = cur.fetchone()[0]
             conn.commit()

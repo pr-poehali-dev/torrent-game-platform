@@ -157,7 +157,7 @@ const AdminDashboard = () => {
           poster: editingTorrent.poster,
           downloads: parseInt(editingTorrent.downloads),
           size: parseFloat(editingTorrent.size),
-          category: editingTorrent.category,
+          categories: Array.isArray(editingTorrent.category) ? editingTorrent.category : [editingTorrent.category],
           description: editingTorrent.description,
           steamDeck: editingTorrent.steamDeck || false,
         }),

@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import {
   Select,
@@ -76,9 +78,13 @@ const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, 
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
-                    <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm whitespace-nowrap">
-                      {torrent.category}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {torrent.category && Array.isArray(torrent.category) && torrent.category.map((cat: string, idx: number) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {cat}
+                        </Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{torrent.size} ГБ</TableCell>
                   <TableCell className="hidden lg:table-cell">{torrent.downloads.toLocaleString('ru-RU')}</TableCell>
@@ -109,26 +115,43 @@ const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, 
                                     required
                                   />
                                 </div>
-                                <div className="space-y-2">
-                                  <Label>Категория</Label>
-                                  <Select 
-                                    value={editingTorrent.category} 
-                                    onValueChange={(value) => setEditingTorrent({...editingTorrent, category: value})}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="action">Экшен</SelectItem>
-                                      <SelectItem value="rpg">RPG</SelectItem>
-                                      <SelectItem value="horror">Хоррор</SelectItem>
-                                      <SelectItem value="sport">Спорт</SelectItem>
-                                      <SelectItem value="racing">Гонки</SelectItem>
-                                      <SelectItem value="strategy">Стратегия</SelectItem>
-                                      <SelectItem value="multiplayer">Мультиплеер</SelectItem>
-                                      <SelectItem value="indie">Инди</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                <div className="space-y-2 md:col-span-2">
+                                  <Label>Категории</Label>
+                                  <div className="border rounded-md p-3 space-y-2">
+                                    {['action', 'rpg', 'horror', 'sport', 'racing', 'strategy', 'multiplayer', 'indie', 'adventure', 'shooter', 'simulation'].map((cat) => {
+                                      const categoryLabels: Record<string, string> = {
+                                        action: 'Экшен',
+                                        rpg: 'RPG',
+                                        horror: 'Хоррор',
+                                        sport: 'Спорт',
+                                        racing: 'Гонки',
+                                        strategy: 'Стратегия',
+                                        multiplayer: 'Мультиплеер',
+                                        indie: 'Инди',
+                                        adventure: 'Приключения',
+                                        shooter: 'Шутер',
+                                        simulation: 'Симулятор'
+                                      };
+                                      const categories = editingTorrent.category || [];
+                                      return (
+                                        <div key={cat} className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`cat-${cat}`}
+                                            checked={categories.includes(cat)}
+                                            onCheckedChange={(checked) => {
+                                              const newCategories = checked
+                                                ? [...categories, cat]
+                                                : categories.filter((c: string) => c !== cat);
+                                              setEditingTorrent({...editingTorrent, category: newCategories});
+                                            }}
+                                          />
+                                          <label htmlFor={`cat-${cat}`} className="text-sm cursor-pointer">
+                                            {categoryLabels[cat]}
+                                          </label>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
                                 <div className="space-y-2">
                                   <Label>Постер URL</Label>

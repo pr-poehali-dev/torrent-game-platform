@@ -27,7 +27,7 @@ interface TorrentCard {
   poster: string;
   downloads: number;
   size: number;
-  category: string;
+  category: string[];
   description: string;
   steamDeck?: boolean;
 }
@@ -121,8 +121,8 @@ const Index = () => {
   };
 
   const popularTorrents = allTorrents.slice(0, 4);
-  const steamDeckGames = allTorrents.filter(t => t.category === 'indie').slice(0, 4);
-  const networkGames = allTorrents.filter(t => t.category === 'multiplayer').slice(0, 4);
+  const steamDeckGames = allTorrents.filter(t => t.category && t.category.includes('indie')).slice(0, 4);
+  const networkGames = allTorrents.filter(t => t.category && t.category.includes('multiplayer')).slice(0, 4);
 
   const formatDownloads = (num: number) => {
     return num.toLocaleString('ru-RU');
@@ -320,10 +320,12 @@ const Index = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute top-3 right-3 flex flex-col gap-2">
-                    <Badge className="bg-primary/90 backdrop-blur-sm">
-                      <Icon name={getCategoryIcon(torrent.category)} size={12} className="mr-1" />
-                      {torrent.category}
-                    </Badge>
+                    {torrent.category && torrent.category.length > 0 && torrent.category.map((cat, idx) => (
+                      <Badge key={idx} className="bg-primary/90 backdrop-blur-sm">
+                        <Icon name={getCategoryIcon(cat)} size={12} className="mr-1" />
+                        {cat}
+                      </Badge>
+                    ))}
                     {torrent.steamDeck && (
                       <Badge className="bg-green-500/90 backdrop-blur-sm">
                         <Icon name="Gamepad2" size={12} className="mr-1" />
@@ -366,10 +368,12 @@ const Index = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute top-3 right-3 flex flex-col gap-2">
-                    <Badge className="bg-primary/90 backdrop-blur-sm">
-                      <Icon name={getCategoryIcon(torrent.category)} size={12} className="mr-1" />
-                      {torrent.category}
-                    </Badge>
+                    {torrent.category && torrent.category.length > 0 && torrent.category.map((cat, idx) => (
+                      <Badge key={idx} className="bg-primary/90 backdrop-blur-sm">
+                        <Icon name={getCategoryIcon(cat)} size={12} className="mr-1" />
+                        {cat}
+                      </Badge>
+                    ))}
                     {torrent.steamDeck && (
                       <Badge className="bg-green-500/90 backdrop-blur-sm">
                         <Icon name="Gamepad2" size={12} className="mr-1" />
@@ -411,10 +415,12 @@ const Index = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute top-3 right-3 flex flex-col gap-2">
-                    <Badge className="bg-primary/90 backdrop-blur-sm">
-                      <Icon name={getCategoryIcon(torrent.category)} size={12} className="mr-1" />
-                      {torrent.category}
-                    </Badge>
+                    {torrent.category && torrent.category.length > 0 && torrent.category.map((cat, idx) => (
+                      <Badge key={idx} className="bg-primary/90 backdrop-blur-sm">
+                        <Icon name={getCategoryIcon(cat)} size={12} className="mr-1" />
+                        {cat}
+                      </Badge>
+                    ))}
                     {torrent.steamDeck && (
                       <Badge className="bg-green-500/90 backdrop-blur-sm">
                         <Icon name="Gamepad2" size={12} className="mr-1" />
