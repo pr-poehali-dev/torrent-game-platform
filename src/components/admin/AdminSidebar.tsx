@@ -26,7 +26,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
       
       <aside className={`
         fixed lg:sticky top-0 h-screen overflow-y-auto
-        w-64 border-r border-border bg-card/50 z-50
+        w-64 border-r border-border lg:bg-card/50 bg-card z-50
         transition-transform duration-300 lg:translate-x-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
@@ -106,7 +106,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
         </div>
       </nav>
 
-      <div className="absolute bottom-0 w-64 p-4 border-t border-border bg-card/50">
+      <div className="absolute bottom-0 w-64 p-4 border-t border-border lg:bg-card/50 bg-card">
         <Button variant="outline" onClick={onLogout} className="w-full">
           <Icon name="LogOut" size={18} className="mr-2" />
           Выйти
