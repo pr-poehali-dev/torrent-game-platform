@@ -159,6 +159,7 @@ const AdminDashboard = () => {
           size: parseFloat(editingTorrent.size),
           category: editingTorrent.category,
           description: editingTorrent.description,
+          steamDeck: editingTorrent.steamDeck || false,
         }),
       });
 
