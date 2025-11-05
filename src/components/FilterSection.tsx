@@ -153,7 +153,7 @@ const FilterSection = ({
           )}
 
           <div className="relative pt-4" ref={searchRef}>
-            <div className="flex gap-2">
+            <div className="flex gap-2 p-4 rounded-lg border border-primary/30 bg-card/50">
               <Input
                 type="text"
                 placeholder="Введите название игры..."
