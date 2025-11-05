@@ -97,7 +97,7 @@ const SearchResults = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => navigate('/')}
             className="mb-4"
           >
