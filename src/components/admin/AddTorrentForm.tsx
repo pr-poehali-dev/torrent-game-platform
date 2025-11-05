@@ -106,7 +106,7 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
                   </div>
                 </div>
                 {formData.poster && (
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 relative">
                     <div className="w-32 h-44 rounded-lg overflow-hidden border-2 border-border bg-secondary">
                       <img 
                         src={formData.poster} 
@@ -117,6 +117,15 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
                         }}
                       />
                     </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                      onClick={() => onChange("poster", "")}
+                    >
+                      <Icon name="X" size={14} />
+                    </Button>
                   </div>
                 )}
               </div>
