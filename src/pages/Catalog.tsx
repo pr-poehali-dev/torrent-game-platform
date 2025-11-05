@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import TorrentGrid from "@/components/TorrentGrid";
 
@@ -17,6 +18,7 @@ interface TorrentCard {
 }
 
 const Catalog = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [allTorrents, setAllTorrents] = useState<TorrentCard[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -130,6 +132,15 @@ const Catalog = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="mb-4 -ml-2"
+          >
+            <Icon name="ArrowLeft" size={18} className="mr-2" />
+            Назад
+          </Button>
+
           <div className="flex items-center gap-3 mb-4">
             <Icon name="Filter" className="text-primary" size={24} />
             <h1 className="text-3xl font-bold">Результаты фильтрации</h1>
