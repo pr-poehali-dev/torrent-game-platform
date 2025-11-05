@@ -153,11 +153,6 @@ const FilterSection = ({
           )}
 
           <div className="relative pt-4" ref={searchRef}>
-            <div className="flex items-center gap-3 mb-2">
-              <Icon name="Search" className="text-primary" size={20} />
-              <h3 className="text-lg font-semibold">Поиск</h3>
-            </div>
-            
             <div className="flex gap-2">
               <Input
                 type="text"
@@ -173,7 +168,6 @@ const FilterSection = ({
                 className="flex-1"
               />
               <Button onClick={handleSearch} disabled={!searchQuery.trim()}>
-                <Icon name="Search" size={18} className="mr-2" />
                 Найти
               </Button>
             </div>
