@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Parse Steam game by App ID",
+      "method": "GET",
+      "path": "/?appId=570",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "name": "string",
+        "appId": "string",
+        "headerImage": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Missing parameters",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "Missing url or appId parameter"
+      }
+    }
+  ]
+}
