@@ -319,7 +319,7 @@ const Index = () => {
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                  <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
                     {torrent.category && torrent.category.length > 0 && torrent.category.map((cat, idx) => (
                       <Badge key={idx} className="bg-primary/90 backdrop-blur-sm">
                         <Icon name={getCategoryIcon(cat)} size={12} className="mr-1" />
@@ -367,7 +367,7 @@ const Index = () => {
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                  <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
                     {torrent.category && torrent.category.length > 0 && torrent.category.map((cat, idx) => (
                       <Badge key={idx} className="bg-primary/90 backdrop-blur-sm">
                         <Icon name={getCategoryIcon(cat)} size={12} className="mr-1" />
@@ -414,7 +414,7 @@ const Index = () => {
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                  <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
                     {torrent.category && torrent.category.length > 0 && torrent.category.map((cat, idx) => (
                       <Badge key={idx} className="bg-primary/90 backdrop-blur-sm">
                         <Icon name={getCategoryIcon(cat)} size={12} className="mr-1" />
