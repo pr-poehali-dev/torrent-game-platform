@@ -212,7 +212,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     """INSERT INTO t_p88186320_torrent_game_platfor.users 
                        (username, email, password_hash, avatar, first_name) 
                        VALUES (%s, %s, %s, %s, %s) 
-                       RETURNING id, username, email, avatar, first_name, created_at""",
+                       RETURNING id, username, email, avatar, first_name, created_at, is_admin""",
                     (username, email, password_hash, avatar, username)
                 )
                 
@@ -225,7 +225,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'email': user_row[2],
                     'avatar': user_row[3],
                     'first_name': user_row[4],
-                    'created_at': user_row[5].isoformat() if user_row[5] else None
+                    'created_at': user_row[5].isoformat() if user_row[5] else None,
+                    'is_admin': user_row[6] or False
                 }
                 
                 return {
@@ -254,7 +255,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 password_hash = hash_password(password)
                 
                 cur.execute(
-                    """SELECT id, username, email, avatar, first_name, created_at 
+                    """SELECT id, username, email, avatar, first_name, created_at, is_admin 
                        FROM t_p88186320_torrent_game_platfor.users 
                        WHERE email = %s AND password_hash = %s""",
                     (email, password_hash)
@@ -276,7 +277,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'email': user_row[2],
                     'avatar': user_row[3],
                     'first_name': user_row[4],
-                    'created_at': user_row[5].isoformat() if user_row[5] else None
+                    'created_at': user_row[5].isoformat() if user_row[5] else None,
+                    'is_admin': user_row[6] or False
                 }
                 
                 return {
@@ -289,6 +291,58 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'token': f"user_{user_data['id']}"
                     })
                 }
+        
+        elif action == 'users' and method == 'GET':
+            cur.execute("""
+                SELECT id, username, email, avatar, first_name, created_at, is_admin 
+                FROM t_p88186320_torrent_game_platfor.users 
+                ORDER BY created_at DESC
+            """)
+            rows = cur.fetchall()
+            users = []
+            for row in rows:
+                users.append({
+                    'id': row[0],
+                    'username': row[1],
+                    'email': row[2],
+                    'avatar': row[3],
+                    'first_name': row[4],
+                    'created_at': row[5].isoformat() if row[5] else None,
+                    'is_admin': row[6] or False
+                })
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({'users': users})
+            }
+        
+        elif action == 'users' and method == 'PUT':
+            user_id = query_params.get('id')
+            if not user_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'error': 'User ID is required'})
+                }
+            
+            body_data = json.loads(event.get('body', '{}'))
+            is_admin = body_data.get('is_admin', False)
+            
+            cur.execute(
+                "UPDATE t_p88186320_torrent_game_platfor.users SET is_admin = %s WHERE id = %s",
+                (is_admin, user_id)
+            )
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({'success': True, 'message': 'User updated successfully'})
+            }
         
         elif action == 'categories' and method == 'GET':
             cur.execute("SELECT id, name, slug, icon FROM t_p88186320_torrent_game_platfor.categories ORDER BY name")

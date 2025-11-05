@@ -32,6 +32,13 @@ const Header = ({ user, onOpenAuth, handleLogout }: HeaderProps) => {
           </div>
           
           <div className="flex items-center gap-4">
+            {user?.is_admin && (
+              <Button variant="outline" onClick={() => window.location.href = '/admin'}>
+                <Icon name="Shield" size={18} className="mr-2" />
+                Админка
+              </Button>
+            )}
+            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

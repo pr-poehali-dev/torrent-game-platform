@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -13,14 +14,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface UsersTableProps {
-  users: any[];
-  onDelete: (id: string) => void;
-  onRefresh: () => void;
-}
-
-const UsersTable = ({ users, onDelete, onRefresh }: UsersTableProps) => {
+const UserManagement = () => {
   const { toast } = useToast();
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=users');
+      const data = await response.json();
+      setUsers(data.users || []);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить пользователей",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleAdmin = async (userId: number, currentStatus: boolean) => {
     try {
@@ -37,7 +55,7 @@ const UsersTable = ({ users, onDelete, onRefresh }: UsersTableProps) => {
           title: currentStatus ? "Права администратора отозваны" : "Права администратора выданы",
           description: "Изменения применены успешно",
         });
-        onRefresh();
+        fetchUsers();
       }
     } catch (error) {
       toast({
@@ -47,6 +65,29 @@ const UsersTable = ({ users, onDelete, onRefresh }: UsersTableProps) => {
       });
     }
   };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
+    return (
+      <Card className="bg-card border-border">
+        <CardContent className="p-6 text-center">
+          <Icon name="Loader2" className="animate-spin text-primary mx-auto mb-4" size={48} />
+          <p className="text-muted-foreground">Загрузка пользователей...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="bg-card border-border">
       <CardHeader>
@@ -56,13 +97,13 @@ const UsersTable = ({ users, onDelete, onRefresh }: UsersTableProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border border-border overflow-x-auto">
+        <div className="rounded-md border border-border overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-secondary/50">
-                <TableHead className="min-w-[200px]">Пользователь</TableHead>
-                <TableHead className="min-w-[180px] hidden sm:table-cell">Email</TableHead>
-                <TableHead className="hidden md:table-cell">Дата регистрации</TableHead>
+                <TableHead>Пользователь</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Дата регистрации</TableHead>
                 <TableHead>Статус</TableHead>
                 <TableHead className="text-right">Действия</TableHead>
               </TableRow>
@@ -78,26 +119,23 @@ const UsersTable = ({ users, onDelete, onRefresh }: UsersTableProps) => {
                       </Avatar>
                       <div>
                         <div className="font-medium">{user.first_name || user.username}</div>
-                        <div className="text-xs text-muted-foreground">@{user.username}</div>
-                        <div className="sm:hidden text-xs text-muted-foreground mt-1">
-                          {user.email}
-                        </div>
+                        <div className="text-sm text-muted-foreground">@{user.username}</div>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell>
                     <span className="text-sm">{user.email}</span>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell>
                     <span className="text-sm text-muted-foreground">
-                      {new Date(user.created_at).toLocaleDateString('ru-RU')}
+                      {formatDate(user.created_at)}
                     </span>
                   </TableCell>
                   <TableCell>
                     {user.is_admin ? (
                       <Badge className="bg-primary text-primary-foreground">
                         <Icon name="Shield" size={12} className="mr-1" />
-                        Админ
+                        Администратор
                       </Badge>
                     ) : (
                       <Badge variant="secondary">
@@ -107,35 +145,27 @@ const UsersTable = ({ users, onDelete, onRefresh }: UsersTableProps) => {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant={user.is_admin ? "outline" : "default"}
-                        size="sm"
-                        onClick={() => toggleAdmin(user.id, user.is_admin)}
-                      >
-                        <Icon name={user.is_admin ? "ShieldOff" : "ShieldCheck"} size={16} className="sm:mr-2" />
-                        <span className="hidden sm:inline">
-                          {user.is_admin ? "Отозвать" : "Сделать админом"}
-                        </span>
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={() => onDelete(user.id)}
-                      >
-                        <Icon name="Trash2" size={16} className="sm:mr-2" />
-                        <span className="hidden sm:inline">Удалить</span>
-                      </Button>
-                    </div>
+                    <Button
+                      variant={user.is_admin ? "destructive" : "default"}
+                      size="sm"
+                      onClick={() => toggleAdmin(user.id, user.is_admin)}
+                    >
+                      <Icon name={user.is_admin ? "ShieldOff" : "ShieldCheck"} size={16} className="mr-2" />
+                      {user.is_admin ? "Отозвать права" : "Сделать админом"}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
+        
+        <div className="mt-4 text-sm text-muted-foreground">
+          Всего пользователей: {users.length}
+        </div>
       </CardContent>
     </Card>
   );
 };
 
-export default UsersTable;
+export default UserManagement;

@@ -368,6 +368,7 @@ const AdminDashboard = () => {
               <UsersTable 
                 users={users}
                 onDelete={handleUserDelete}
+                onRefresh={fetchUsers}
               />
             )}
 
