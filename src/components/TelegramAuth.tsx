@@ -19,24 +19,24 @@ const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://telegram.org/js/telegram-widget.js?22';
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.async = true;
     document.body.appendChild(script);
 
     window.onTelegramAuth = (user: any) => {
       setLoading(true);
-      
+
       const userData = {
         telegram_id: user.id,
-        username: user.username || '',
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        photo_url: user.photo_url || ''
+        username: user.username || "",
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        photo_url: user.photo_url || "",
       };
 
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('authToken', `tg_${user.id}`);
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("authToken", `tg_${user.id}`);
 
       toast({
         title: "Вход выполнен",
@@ -53,16 +53,16 @@ const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
   }, [onAuth, toast]);
 
   const handleTelegramLogin = () => {
-    const botUsername = 'YOUR_BOT_USERNAME';
+    const botUsername = "Torrtop_bot";
     const width = 600;
     const height = 700;
-    const left = (window.screen.width / 2) - (width / 2);
-    const top = (window.screen.height / 2) - (height / 2);
-    
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+
     window.open(
-      `https://oauth.telegram.org/auth?bot_id=YOUR_BOT_ID&origin=${window.location.origin}&request_access=write`,
-      'telegram-login',
-      `width=${width},height=${height},left=${left},top=${top}`
+      `https://oauth.telegram.org/auth?bot_id=8213964528:AAHCRyuqTu6RFpVIsrQD0qlkiEm-DFf63mo&origin=${window.location.origin}&request_access=write`,
+      "telegram-login",
+      `width=${width},height=${height},left=${left},top=${top}`,
     );
   };
 
@@ -73,7 +73,11 @@ const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
       variant="outline"
       size="icon"
     >
-      <Icon name={loading ? "Loader2" : "Send"} size={20} className={loading ? "animate-spin" : ""} />
+      <Icon
+        name={loading ? "Loader2" : "Send"}
+        size={20}
+        className={loading ? "animate-spin" : ""}
+      />
     </Button>
   );
 };
