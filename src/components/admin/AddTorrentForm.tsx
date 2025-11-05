@@ -49,6 +49,14 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
       onChange("title", data.name || "");
       onChange("description", data.description || "");
       
+      if (data.steamRating) {
+        onChange("steamRating", data.steamRating);
+      }
+      
+      if (data.metacriticScore) {
+        onChange("metacriticScore", data.metacriticScore);
+      }
+      
       if (data.screenshots && data.screenshots.length > 0) {
         setSteamScreenshots(data.screenshots);
         setShowScreenshots(true);
