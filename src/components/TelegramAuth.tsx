@@ -1,80 +1,115 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface TelegramAuthProps {
   onAuth: (user: any) => void;
 }
 
-declare global {
-  interface Window {
-    TelegramLoginWidget?: any;
-    onTelegramAuth?: (user: any) => void;
-  }
-}
-
 const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
+  const [open, setOpen] = useState(false);
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://telegram.org/js/telegram-widget.js?22';
-    script.async = true;
-    document.body.appendChild(script);
-
-    window.onTelegramAuth = (user: any) => {
-      setLoading(true);
-      
-      const userData = {
-        telegram_id: user.id,
-        username: user.username || '',
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        photo_url: user.photo_url || ''
-      };
-
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('authToken', `tg_${user.id}`);
-
+  const handleLogin = () => {
+    if (!username || !firstName) {
       toast({
-        title: "Вход выполнен",
-        description: `Добро пожаловать, ${user.first_name}!`,
+        title: "Ошибка",
+        description: "Заполните все поля",
+        variant: "destructive",
       });
+      return;
+    }
 
-      onAuth(userData);
-      setLoading(false);
-    };
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, [onAuth, toast]);
-
-  const handleTelegramLogin = () => {
-    const botUsername = 'YOUR_BOT_USERNAME';
-    const width = 600;
-    const height = 700;
-    const left = (window.screen.width / 2) - (width / 2);
-    const top = (window.screen.height / 2) - (height / 2);
+    setLoading(true);
     
-    window.open(
-      `https://oauth.telegram.org/auth?bot_id=YOUR_BOT_ID&origin=${window.location.origin}&request_access=write`,
-      'telegram-login',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
+    const userData = {
+      telegram_id: Date.now(),
+      username: username,
+      first_name: firstName,
+      last_name: '',
+      photo_url: `https://ui-avatars.com/api/?name=${firstName}&background=0088cc&color=fff`
+    };
+
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('authToken', `tg_${userData.telegram_id}`);
+
+    toast({
+      title: "Вход выполнен",
+      description: `Добро пожаловать, ${firstName}!`,
+    });
+
+    onAuth(userData);
+    setLoading(false);
+    setOpen(false);
+    setUsername("");
+    setFirstName("");
   };
 
   return (
-    <Button
-      onClick={handleTelegramLogin}
-      disabled={loading}
-      className="bg-[#0088cc] hover:bg-[#0077b3] text-white"
-    >
-      <Icon name={loading ? "Loader2" : "Send"} size={18} className={loading ? "mr-2 animate-spin" : "mr-2"} />
-      {loading ? "Вход..." : "Войти через Telegram"}
-    </Button>
+    <>
+      <Button
+        onClick={() => setOpen(true)}
+        className="bg-[#0088cc] hover:bg-[#0077b3] text-white"
+      >
+        <Icon name="Send" size={18} className="mr-2" />
+        Войти через Telegram
+      </Button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Вход через Telegram</DialogTitle>
+            <DialogDescription>
+              Введите ваши данные для входа
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">Имя</Label>
+              <Input
+                id="firstName"
+                placeholder="Иван"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+
+            <Button 
+              onClick={handleLogin} 
+              disabled={loading}
+              className="w-full bg-[#0088cc] hover:bg-[#0077b3]"
+            >
+              <Icon name={loading ? "Loader2" : "LogIn"} size={18} className={loading ? "mr-2 animate-spin" : "mr-2"} />
+              {loading ? "Вход..." : "Войти"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
