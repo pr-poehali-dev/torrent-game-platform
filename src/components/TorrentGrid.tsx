@@ -74,7 +74,7 @@ const TorrentGrid = ({ torrents, formatDownloads, getCategoryIcon }: TorrentGrid
                       {Math.round(torrent.steamRating * 0.85).toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 flex-1">
+                  <div className="flex items-center gap-1 flex-1 justify-end">
                     <Icon name="ThumbsDown" size={12} className="text-red-500" />
                     <span className="text-xs font-semibold text-red-500">
                       {Math.round(torrent.steamRating * 0.15).toLocaleString()}
