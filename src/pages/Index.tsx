@@ -121,7 +121,11 @@ const Index = () => {
     }
   };
 
-  const popularTorrents = allTorrents.slice(0, 4);
+  const filteredTorrents = selectedCategory 
+    ? allTorrents.filter(t => t.category && t.category.includes(selectedCategory))
+    : allTorrents;
+
+  const popularTorrents = filteredTorrents.slice(0, 8);
   const steamDeckGames = allTorrents.filter(t => t.category && t.category.includes('indie')).slice(0, 4);
   const networkGames = allTorrents.filter(t => t.category && t.category.includes('multiplayer')).slice(0, 4);
 
@@ -344,7 +348,16 @@ const Index = () => {
         <section className="mb-16 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center gap-3 mb-6">
             <Icon name="TrendingUp" className="text-primary" size={24} />
-            <h2 className="text-2xl font-bold">Популярные торренты</h2>
+            <h2 className="text-2xl font-bold">
+              {selectedCategory 
+                ? `${categories.find(c => c.slug === selectedCategory)?.name || 'Категория'}` 
+                : 'Популярные торренты'}
+            </h2>
+            {selectedCategory && (
+              <Badge variant="secondary" className="text-sm">
+                {popularTorrents.length} игр
+              </Badge>
+            )}
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {popularTorrents.map((torrent) => (
@@ -388,12 +401,14 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <div className="flex items-center gap-3 mb-6">
-            <Icon name="Gamepad2" className="text-primary" size={24} />
-            <h2 className="text-2xl font-bold">Поддерживается Steam Deck</h2>
-            <Badge variant="secondary" className="ml-2">Verified</Badge>
-          </div>
+        {!selectedCategory && (
+          <>
+            <section className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center gap-3 mb-6">
+                <Icon name="Gamepad2" className="text-primary" size={24} />
+                <h2 className="text-2xl font-bold">Поддерживается Steam Deck</h2>
+                <Badge variant="secondary" className="ml-2">Verified</Badge>
+              </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {steamDeckGames.map((torrent) => (
               <Card 
@@ -434,13 +449,13 @@ const Index = () => {
               </Card>
             ))}
           </div>
-        </section>
+            </section>
 
-        <section className="mb-16 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <div className="flex items-center gap-3 mb-6">
-            <Icon name="Wifi" className="text-primary" size={24} />
-            <h2 className="text-2xl font-bold">Торренты которые можно играть по сети</h2>
-          </div>
+            <section className="mb-16 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="flex items-center gap-3 mb-6">
+                <Icon name="Wifi" className="text-primary" size={24} />
+                <h2 className="text-2xl font-bold">Торренты которые можно играть по сети</h2>
+              </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {networkGames.map((torrent) => (
               <Card 
@@ -481,7 +496,9 @@ const Index = () => {
               </Card>
             ))}
           </div>
-        </section>
+            </section>
+          </>
+        )}
       </main>
     </div>
   );
