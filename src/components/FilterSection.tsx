@@ -118,7 +118,7 @@ const FilterSection = ({
                 <div
                   key={torrent.id}
                   onClick={() => handleResultClick(torrent.id)}
-                  className="flex items-start gap-3 p-3 hover:bg-accent cursor-pointer transition-colors border-b border-border last:border-b-0"
+                  className="flex items-start gap-3 p-3 cursor-pointer transition-all border-b border-border last:border-b-0 hover:border-l-4 hover:border-l-primary hover:pl-2"
                 >
                   <img
                     src={torrent.poster}
