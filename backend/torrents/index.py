@@ -204,6 +204,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             torrent_id = action
             body_data = json.loads(event.get('body', '{}'))
             
+            print(f"PUT DEBUG: torrent_id={torrent_id}, body_data={body_data}")
+            
             title = body_data.get('title')
             poster = body_data.get('poster')
             downloads = int(body_data.get('downloads', 0))
@@ -212,11 +214,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             description = body_data.get('description', '')
             steam_deck = body_data.get('steamDeck', False)
             
+            print(f"PUT VALUES: title={title}, steam_deck={steam_deck}")
+            
             cur.execute(
                 "UPDATE t_p88186320_torrent_game_platfor.torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s, steam_deck = %s WHERE id = %s",
                 (title, poster, downloads, size, category, description, steam_deck, torrent_id)
             )
             conn.commit()
+            
+            print(f"PUT SUCCESS: updated torrent {torrent_id}")
             
             return {
                 'statusCode': 200,
