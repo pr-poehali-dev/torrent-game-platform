@@ -54,13 +54,14 @@ const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
 
   const handleTelegramLogin = () => {
     const botUsername = "Torrtop_bot";
+    const currentDomain = window.location.hostname;
     const width = 600;
     const height = 700;
     const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
 
     window.open(
-      `https://oauth.telegram.org/auth?bot_id=8213964528:AAHCRyuqTu6RFpVIsrQD0qlkiEm-DFf63mo&origin=${window.location.origin}&request_access=write`,
+      `https://oauth.telegram.org/auth?bot_id=8213964528&origin=${encodeURIComponent(window.location.origin)}&embed=1&request_access=write&return_to=${encodeURIComponent(window.location.origin)}`,
       "telegram-login",
       `width=${width},height=${height},left=${left},top=${top}`,
     );
