@@ -30,7 +30,8 @@ const Index = () => {
     comments: "0"
   });
   const [warningMessage, setWarningMessage] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [steamDeckOnly, setSteamDeckOnly] = useState(false);
 
   useEffect(() => {
     fetchTorrents();
@@ -105,9 +106,19 @@ const Index = () => {
     }
   };
 
-  const filteredTorrents = selectedCategory 
-    ? allTorrents.filter(t => t.category && t.category.includes(selectedCategory))
-    : allTorrents;
+  const filteredTorrents = allTorrents.filter(t => {
+    let matches = true;
+    
+    if (selectedCategories.length > 0) {
+      matches = selectedCategories.some(cat => t.category && t.category.includes(cat));
+    }
+    
+    if (steamDeckOnly) {
+      matches = matches && t.steamDeck === true;
+    }
+    
+    return matches;
+  });
 
   const popularTorrents = filteredTorrents.slice(0, 8);
   const steamDeckGames = allTorrents.filter(t => t.category && t.category.includes('indie')).slice(0, 4);
@@ -158,8 +169,10 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         <FilterSection 
           categories={categories}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
+          steamDeckOnly={steamDeckOnly}
+          setSteamDeckOnly={setSteamDeckOnly}
           getCategoryIcon={getCategoryIcon}
         />
 
@@ -178,11 +191,11 @@ const Index = () => {
           <div className="flex items-center gap-3 mb-6">
             <Icon name="TrendingUp" className="text-primary" size={24} />
             <h2 className="text-2xl font-bold">
-              {selectedCategory 
-                ? `${categories.find(c => c.slug === selectedCategory)?.name || 'Категория'}` 
+              {selectedCategories.length > 0 || steamDeckOnly
+                ? 'Результаты фильтрации' 
                 : 'Популярные торренты'}
             </h2>
-            {selectedCategory && (
+            {(selectedCategories.length > 0 || steamDeckOnly) && (
               <Badge variant="secondary" className="text-sm">
                 {popularTorrents.length} игр
               </Badge>
@@ -195,7 +208,7 @@ const Index = () => {
           />
         </section>
 
-        {!selectedCategory && (
+        {selectedCategories.length === 0 && !steamDeckOnly && (
           <>
             <section className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <div className="flex items-center gap-3 mb-6">
