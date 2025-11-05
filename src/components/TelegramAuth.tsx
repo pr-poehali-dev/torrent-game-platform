@@ -70,7 +70,7 @@ const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
     <Button
       onClick={handleTelegramLogin}
       disabled={loading}
-      variant="ghost"
+      variant="outline"
       size="icon"
     >
       <Icon name={loading ? "Loader2" : "Send"} size={20} className={loading ? "animate-spin" : ""} />
