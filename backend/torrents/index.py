@@ -217,6 +217,40 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'success': True, 'id': category_id, 'message': 'Категория добавлена'})
             }
         
+        elif action == 'categories' and method == 'PUT':
+            category_id = query_params.get('id')
+            if category_id:
+                body_data = json.loads(event.get('body', '{}'))
+                name = body_data.get('name')
+                slug = body_data.get('slug')
+                icon = body_data.get('icon', 'Gamepad2')
+                
+                cur.execute(
+                    "UPDATE t_p88186320_torrent_game_platfor.categories SET name = %s, slug = %s, icon = %s WHERE id = %s",
+                    (name, slug, icon, category_id)
+                )
+                conn.commit()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'success': True, 'message': 'Категория обновлена'})
+                }
+            else:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'error': 'Missing id parameter'})
+                }
+        
         elif action == 'categories' and method == 'DELETE':
             category_id = query_params.get('id')
             if category_id:
