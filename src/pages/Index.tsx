@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -19,6 +20,7 @@ interface TorrentCard {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [allTorrents, setAllTorrents] = useState<TorrentCard[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -144,6 +146,17 @@ const Index = () => {
     return icons[category] || 'Folder';
   };
 
+  const handleApplyFilters = () => {
+    const params = new URLSearchParams();
+    if (selectedCategories.length > 0) {
+      params.set('categories', selectedCategories.join(','));
+    }
+    if (steamDeckOnly) {
+      params.set('steamDeck', 'true');
+    }
+    navigate(`/catalog?${params.toString()}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -171,6 +184,7 @@ const Index = () => {
           steamDeckOnly={steamDeckOnly}
           setSteamDeckOnly={setSteamDeckOnly}
           getCategoryIcon={getCategoryIcon}
+          onApplyFilters={handleApplyFilters}
         />
 
         <StatsSection stats={stats} />

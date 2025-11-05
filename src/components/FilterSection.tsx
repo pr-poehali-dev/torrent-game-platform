@@ -11,6 +11,7 @@ interface FilterSectionProps {
   steamDeckOnly: boolean;
   setSteamDeckOnly: (value: boolean) => void;
   getCategoryIcon: (category: string) => string;
+  onApplyFilters?: () => void;
 }
 
 const FilterSection = ({ 
@@ -19,7 +20,8 @@ const FilterSection = ({
   setSelectedCategories, 
   steamDeckOnly, 
   setSteamDeckOnly, 
-  getCategoryIcon 
+  getCategoryIcon,
+  onApplyFilters
 }: FilterSectionProps) => {
   const toggleCategory = (slug: string) => {
     if (selectedCategories.includes(slug)) {
@@ -91,6 +93,19 @@ const FilterSection = ({
               Поддержка Steam Deck
             </label>
           </div>
+
+          {(selectedCategories.length > 0 || steamDeckOnly) && onApplyFilters && (
+            <div className="pt-4">
+              <Button 
+                onClick={onApplyFilters} 
+                className="w-full"
+                size="lg"
+              >
+                <Icon name="Search" size={18} className="mr-2" />
+                Показать результаты
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
