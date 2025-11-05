@@ -152,7 +152,7 @@ const FilterSection = ({
             </div>
           )}
 
-          <div className="relative pt-4 border-t border-border" ref={searchRef}>
+          <div className="relative pt-4" ref={searchRef}>
             <div className="flex items-center gap-3 mb-2">
               <Icon name="Search" className="text-primary" size={20} />
               <h3 className="text-lg font-semibold">Поиск</h3>
