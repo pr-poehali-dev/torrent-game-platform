@@ -47,7 +47,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             rows = cur.fetchall()
             categories = []
             for row in rows:
-                cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.torrents WHERE category = %s", (row[2],))
+                cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.torrents WHERE %s = ANY(category)", (row[2],))
                 count = cur.fetchone()[0]
                 categories.append({
                     'id': row[0],
