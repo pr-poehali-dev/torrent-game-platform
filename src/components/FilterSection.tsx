@@ -71,9 +71,6 @@ const FilterSection = ({
                 >
                   <Icon name={getCategoryIcon(cat.slug)} size={14} className="mr-1" />
                   {cat.name}
-                  <Badge variant="secondary" className="ml-2">
-                    {cat.count}
-                  </Badge>
                 </Button>
               ))}
             </div>
