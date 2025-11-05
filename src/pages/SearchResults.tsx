@@ -29,7 +29,7 @@ const SearchResults = () => {
 
   const fetchTorrents = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae');
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae', { cache: 'no-store' });
       const data = await response.json();
       setAllTorrents(data.torrents || []);
     } catch (error) {
@@ -41,7 +41,7 @@ const SearchResults = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories');
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories', { cache: 'no-store' });
       const data = await response.json();
       setCategories(data.categories || []);
     } catch (error) {

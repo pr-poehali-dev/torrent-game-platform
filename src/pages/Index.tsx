@@ -73,7 +73,7 @@ const Index = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories');
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories', { cache: 'no-store' });
       const data = await response.json();
       setCategories(data.categories || []);
     } catch (error) {
@@ -83,7 +83,7 @@ const Index = () => {
 
   const fetchTorrents = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae');
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae', { cache: 'no-store' });
       const data = await response.json();
       setAllTorrents(data.torrents || []);
     } catch (error) {
@@ -95,7 +95,7 @@ const Index = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=stats');
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=stats', { cache: 'no-store' });
       const data = await response.json();
       setStats({
         games: data.games.toLocaleString('ru-RU'),
