@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import TelegramAuth from "@/components/TelegramAuth";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,6 +12,13 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TorrentCard {
   id: number;
@@ -27,6 +35,8 @@ const Index = () => {
   const [allTorrents, setAllTorrents] = useState<TorrentCard[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [stats, setStats] = useState({
     games: "0",
     users: "0",
@@ -37,7 +47,23 @@ const Index = () => {
     fetchTorrents();
     fetchStats();
     fetchCategories();
+    
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
   }, []);
+
+  const handleAuth = (userData: any) => {
+    setUser(userData);
+    setShowAuthDialog(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
+    setUser(null);
+  };
 
   const fetchCategories = async () => {
     try {
@@ -144,9 +170,33 @@ const Index = () => {
                   className="pl-10 bg-secondary border-border"
                 />
               </div>
-              <Button variant="ghost" size="icon">
-                <Icon name="User" size={20} />
-              </Button>
+              
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <Avatar>
+                        <AvatarImage src={user.photo_url} />
+                        <AvatarFallback>{user.first_name?.[0] || 'U'}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem disabled>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{user.first_name} {user.last_name}</span>
+                        {user.username && <span className="text-xs text-muted-foreground">@{user.username}</span>}
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <Icon name="LogOut" size={16} className="mr-2" />
+                      Выйти
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <TelegramAuth onAuth={handleAuth} />
+              )}
             </div>
           </div>
           
