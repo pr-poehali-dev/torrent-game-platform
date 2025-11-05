@@ -21,6 +21,8 @@ const AdminDashboard = () => {
     category: [] as string[],
     description: "",
     steamDeck: false,
+    steamRating: null as number | null,
+    metacriticScore: null as number | null,
   });
   const [stats, setStats] = useState({
     games: "0",
@@ -161,6 +163,8 @@ const AdminDashboard = () => {
           categories: Array.isArray(editingTorrent.category) ? editingTorrent.category : [editingTorrent.category],
           description: editingTorrent.description,
           steamDeck: editingTorrent.steamDeck || false,
+          steamRating: editingTorrent.steamRating || null,
+          metacriticScore: editingTorrent.metacriticScore || null,
         }),
       });
 
@@ -208,6 +212,8 @@ const AdminDashboard = () => {
           categories: formData.category,
           description: formData.description,
           steamDeck: formData.steamDeck,
+          steamRating: formData.steamRating,
+          metacriticScore: formData.metacriticScore,
         }),
       });
 
@@ -226,6 +232,8 @@ const AdminDashboard = () => {
           category: [],
           description: "",
           steamDeck: false,
+          steamRating: null,
+          metacriticScore: null,
         });
         
         fetchStats();

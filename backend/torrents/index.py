@@ -45,6 +45,15 @@ def fetch_steam_data(app_id: str) -> Dict[str, Any]:
     if 'screenshots' in game_data:
         screenshots = [s['path_full'] for s in game_data['screenshots'][:5]]
     
+    steam_rating = None
+    steam_rating_percent = None
+    if 'recommendations' in game_data:
+        steam_rating = game_data['recommendations'].get('total', 0)
+    
+    metacritic_score = None
+    if 'metacritic' in game_data:
+        metacritic_score = game_data['metacritic'].get('score', None)
+    
     result = {
         'name': game_data.get('name', ''),
         'description': game_data.get('short_description', ''),
@@ -57,7 +66,9 @@ def fetch_steam_data(app_id: str) -> Dict[str, Any]:
         'genres': [g['description'] for g in game_data.get('genres', [])],
         'isFree': game_data.get('is_free', False),
         'appId': app_id,
-        'steamUrl': f'https://store.steampowered.com/app/{app_id}'
+        'steamUrl': f'https://store.steampowered.com/app/{app_id}',
+        'steamRating': steam_rating,
+        'metacriticScore': metacritic_score
     }
     
     if 'price_overview' in game_data:
@@ -332,9 +343,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             print(f"PUT VALUES: title={title}, steam_deck={steam_deck}, categories={categories}")
             
+            steam_rating = body_data.get('steamRating')
+            metacritic_score = body_data.get('metacriticScore')
+            
             cur.execute(
-                "UPDATE t_p88186320_torrent_game_platfor.torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s, steam_deck = %s WHERE id = %s",
-                (title, poster, downloads, size, categories, description, steam_deck, torrent_id)
+                "UPDATE t_p88186320_torrent_game_platfor.torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s, steam_deck = %s, steam_rating = %s, metacritic_score = %s WHERE id = %s",
+                (title, poster, downloads, size, categories, description, steam_deck, steam_rating, metacritic_score, torrent_id)
             )
             conn.commit()
             
@@ -355,12 +369,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if category:
                 cur.execute(
-                    "SELECT id, title, poster, downloads, size, category, description, steam_deck FROM t_p88186320_torrent_game_platfor.torrents WHERE %s = ANY(category) ORDER BY downloads DESC",
+                    "SELECT id, title, poster, downloads, size, category, description, steam_deck, steam_rating, metacritic_score FROM t_p88186320_torrent_game_platfor.torrents WHERE %s = ANY(category) ORDER BY downloads DESC",
                     (category,)
                 )
             else:
                 cur.execute(
-                    "SELECT id, title, poster, downloads, size, category, description, steam_deck FROM t_p88186320_torrent_game_platfor.torrents ORDER BY downloads DESC"
+                    "SELECT id, title, poster, downloads, size, category, description, steam_deck, steam_rating, metacritic_score FROM t_p88186320_torrent_game_platfor.torrents ORDER BY downloads DESC"
                 )
             
             rows = cur.fetchall()
@@ -374,7 +388,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'size': float(row[4]),
                     'category': row[5],
                     'description': row[6],
-                    'steamDeck': bool(row[7])
+                    'steamDeck': bool(row[7]),
+                    'steamRating': row[8] if len(row) > 8 else None,
+                    'metacriticScore': row[9] if len(row) > 9 else None
                 })
             
             return {
@@ -397,10 +413,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             categories = body_data.get('categories', [])
             description = body_data.get('description', '')
             steam_deck = body_data.get('steamDeck', False)
+            steam_rating = body_data.get('steamRating')
+            metacritic_score = body_data.get('metacriticScore')
             
             cur.execute(
-                "INSERT INTO t_p88186320_torrent_game_platfor.torrents (title, poster, downloads, size, category, description, steam_deck) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id",
-                (title, poster, downloads, size, categories, description, steam_deck)
+                "INSERT INTO t_p88186320_torrent_game_platfor.torrents (title, poster, downloads, size, category, description, steam_deck, steam_rating, metacritic_score) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
+                (title, poster, downloads, size, categories, description, steam_deck, steam_rating, metacritic_score)
             )
             torrent_id = cur.fetchone()[0]
             conn.commit()

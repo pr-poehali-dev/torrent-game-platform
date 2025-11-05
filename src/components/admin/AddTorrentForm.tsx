@@ -15,6 +15,8 @@ interface AddTorrentFormProps {
     category: string[];
     description: string;
     steamDeck: boolean;
+    steamRating?: number | null;
+    metacriticScore?: number | null;
   };
   categories: Array<{ id: number; name: string; slug: string }>;
   onSubmit: (e: React.FormEvent) => void;
@@ -47,6 +49,8 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
       onChange("title", data.name || "");
       onChange("poster", data.headerImage || "");
       onChange("description", data.description || "");
+      onChange("steamRating", data.steamRating || null);
+      onChange("metacriticScore", data.metacriticScore || null);
       
       if (data.screenshots && data.screenshots.length > 0) {
         setSteamScreenshots(data.screenshots);

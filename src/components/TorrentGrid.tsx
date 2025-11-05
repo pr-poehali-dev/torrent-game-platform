@@ -11,6 +11,8 @@ interface TorrentCard {
   category: string[];
   description: string;
   steamDeck?: boolean;
+  steamRating?: number | null;
+  metacriticScore?: number | null;
 }
 
 interface TorrentGridProps {
@@ -50,6 +52,17 @@ const TorrentGrid = ({ torrents, formatDownloads, getCategoryIcon }: TorrentGrid
           </div>
           <CardContent className="p-4">
             <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
+            
+            {torrent.steamRating && torrent.steamRating > 0 && (
+              <div className="flex items-center gap-1 mb-2">
+                <Icon name="ThumbsUp" size={14} className="text-primary" />
+                <span className="text-xs font-semibold text-primary">
+                  {(torrent.steamRating / 1000).toFixed(0)}K
+                </span>
+                <span className="text-xs text-muted-foreground">отзывов</span>
+              </div>
+            )}
+            
             <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs">
               <div className="flex items-center gap-1">
                 <Icon name="Download" size={14} />
