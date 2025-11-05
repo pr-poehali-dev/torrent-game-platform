@@ -46,6 +46,9 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
       
       const data = await response.json();
       
+      onChange("title", data.name || "");
+      onChange("description", data.description || "");
+      
       if (data.screenshots && data.screenshots.length > 0) {
         setSteamScreenshots(data.screenshots);
         setShowScreenshots(true);
