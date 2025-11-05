@@ -185,6 +185,7 @@ const Index = () => {
           setSteamDeckOnly={setSteamDeckOnly}
           getCategoryIcon={getCategoryIcon}
           onApplyFilters={handleApplyFilters}
+          allTorrents={allTorrents}
         />
 
         <StatsSection stats={stats} />
