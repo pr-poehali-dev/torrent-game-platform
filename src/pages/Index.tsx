@@ -29,6 +29,7 @@ interface TorrentCard {
   size: number;
   category: string;
   description: string;
+  steamDeck?: boolean;
 }
 
 const Index = () => {

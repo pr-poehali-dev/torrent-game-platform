@@ -239,12 +239,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if category:
                 cur.execute(
-                    "SELECT id, title, poster, downloads, size, category, description FROM torrents WHERE category = %s ORDER BY downloads DESC",
+                    "SELECT id, title, poster, downloads, size, category, description, steam_deck FROM t_p88186320_torrent_game_platfor.torrents WHERE category = %s ORDER BY downloads DESC",
                     (category,)
                 )
             else:
                 cur.execute(
-                    "SELECT id, title, poster, downloads, size, category, description FROM torrents ORDER BY downloads DESC"
+                    "SELECT id, title, poster, downloads, size, category, description, steam_deck FROM t_p88186320_torrent_game_platfor.torrents ORDER BY downloads DESC"
                 )
             
             rows = cur.fetchall()
@@ -257,7 +257,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'downloads': row[3],
                     'size': float(row[4]),
                     'category': row[5],
-                    'description': row[6]
+                    'description': row[6],
+                    'steamDeck': bool(row[7])
                 })
             
             return {
