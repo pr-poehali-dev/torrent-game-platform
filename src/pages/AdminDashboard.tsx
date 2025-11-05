@@ -147,7 +147,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch(`https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae/${editingTorrent.id}`, {
+      const response = await fetch(`https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=${editingTorrent.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
