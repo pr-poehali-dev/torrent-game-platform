@@ -8,13 +8,28 @@ interface AdminSidebarProps {
   torrentsCount: number;
   usersCount: number;
   onLogout: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLogout }: AdminSidebarProps) => {
+const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLogout, isOpen, onClose }: AdminSidebarProps) => {
   const navigate = useNavigate();
 
   return (
-    <aside className="w-64 border-r border-border bg-card/50 sticky top-0 h-screen overflow-y-auto">
+    <>
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+      
+      <aside className={`
+        fixed lg:sticky top-0 h-screen overflow-y-auto
+        w-64 border-r border-border bg-card/50 z-50
+        transition-transform duration-300 lg:translate-x-0
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3">
           <Icon name="Shield" className="text-primary" size={28} />
@@ -98,6 +113,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
         </Button>
       </div>
     </aside>
+    </>
   );
 };
 

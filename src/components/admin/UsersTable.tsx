@@ -25,22 +25,29 @@ const UsersTable = ({ users, onDelete }: UsersTableProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border border-border overflow-hidden">
+        <div className="rounded-md border border-border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-secondary/50">
-                <TableHead>Имя</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Дата регистрации</TableHead>
+                <TableHead className="min-w-[120px]">Имя</TableHead>
+                <TableHead className="min-w-[180px] hidden sm:table-cell">Email</TableHead>
+                <TableHead className="hidden md:table-cell">Дата регистрации</TableHead>
                 <TableHead className="text-right">Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium">
+                    <div>
+                      <div>{user.username}</div>
+                      <div className="sm:hidden text-xs text-muted-foreground mt-1">
+                        {user.email}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">{user.email}</TableCell>
+                  <TableCell className="hidden md:table-cell">
                     {new Date(user.created_at).toLocaleDateString('ru-RU')}
                   </TableCell>
                   <TableCell className="text-right">
@@ -49,8 +56,8 @@ const UsersTable = ({ users, onDelete }: UsersTableProps) => {
                       size="sm"
                       onClick={() => onDelete(user.id)}
                     >
-                      <Icon name="Trash2" size={16} className="mr-2" />
-                      Удалить
+                      <Icon name="Trash2" size={16} className="sm:mr-2" />
+                      <span className="hidden sm:inline">Удалить</span>
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -8,6 +8,7 @@ import TorrentsTable from "@/components/admin/TorrentsTable";
 import UsersTable from "@/components/admin/UsersTable";
 import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog";
 import AdminFunctions from "@/components/admin/AdminFunctions";
+import Icon from "@/components/ui/icon";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const AdminDashboard = () => {
   const [deleteType, setDeleteType] = useState<'torrent' | 'user'>('torrent');
   const [activeTab, setActiveTab] = useState('add');
   const [uploadingPoster, setUploadingPoster] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const isAuth = localStorage.getItem("adminAuth");
@@ -298,14 +300,28 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-background flex">
       <AdminSidebar 
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          setSidebarOpen(false);
+        }}
         torrentsCount={torrents.length}
         usersCount={users.length}
         onLogout={handleLogout}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto px-8 py-8">
+        <div className="lg:hidden fixed top-4 left-4 z-40">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg bg-card border border-border shadow-lg"
+          >
+            <Icon name="Menu" size={24} />
+          </button>
+        </div>
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
           <StatsCards stats={stats} />
 
           <div className="w-full">

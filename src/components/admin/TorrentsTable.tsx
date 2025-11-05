@@ -45,15 +45,15 @@ const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, 
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border border-border overflow-hidden">
+        <div className="rounded-md border border-border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-secondary/50">
-                <TableHead>Постер</TableHead>
-                <TableHead>Название</TableHead>
-                <TableHead>Категория</TableHead>
-                <TableHead>Размер</TableHead>
-                <TableHead>Скачивания</TableHead>
+                <TableHead className="w-20">Постер</TableHead>
+                <TableHead className="min-w-[150px]">Название</TableHead>
+                <TableHead className="hidden sm:table-cell">Категория</TableHead>
+                <TableHead className="hidden md:table-cell">Размер</TableHead>
+                <TableHead className="hidden lg:table-cell">Скачивания</TableHead>
                 <TableHead className="text-right">Действия</TableHead>
               </TableRow>
             </TableHeader>
@@ -64,19 +64,26 @@ const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, 
                     <img 
                       src={torrent.poster} 
                       alt={torrent.title}
-                      className="w-16 h-20 object-cover rounded"
+                      className="w-12 h-16 sm:w-16 sm:h-20 object-cover rounded"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{torrent.title}</TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm">
+                  <TableCell className="font-medium">
+                    <div className="min-w-[120px]">
+                      <div className="line-clamp-2">{torrent.title}</div>
+                      <div className="sm:hidden text-xs text-muted-foreground mt-1">
+                        {torrent.size} ГБ
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm whitespace-nowrap">
                       {torrent.category}
                     </span>
                   </TableCell>
-                  <TableCell>{torrent.size} ГБ</TableCell>
-                  <TableCell>{torrent.downloads.toLocaleString('ru-RU')}</TableCell>
+                  <TableCell className="hidden md:table-cell">{torrent.size} ГБ</TableCell>
+                  <TableCell className="hidden lg:table-cell">{torrent.downloads.toLocaleString('ru-RU')}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex gap-2 justify-end">
+                    <div className="flex gap-1 sm:gap-2 justify-end">
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button 

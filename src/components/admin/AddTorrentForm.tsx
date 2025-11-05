@@ -37,8 +37,8 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
+        <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="title">Название игры</Label>
               <Input
