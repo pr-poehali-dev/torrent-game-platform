@@ -84,7 +84,7 @@ const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, 
                   <TableCell className="hidden lg:table-cell">{torrent.downloads.toLocaleString('ru-RU')}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-1 sm:gap-2 justify-end">
-                      <Dialog>
+                      <Dialog open={editingTorrent?.id === torrent.id} onOpenChange={(open) => !open && setEditingTorrent(null)}>
                         <DialogTrigger asChild>
                           <Button 
                             variant="outline" 
