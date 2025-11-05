@@ -54,6 +54,19 @@ const Index = () => {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+
+    const savedWarning = localStorage.getItem('siteWarning');
+    if (savedWarning) {
+      setWarningMessage(savedWarning);
+    }
+
+    const handleWarningUpdate = () => {
+      const updatedWarning = localStorage.getItem('siteWarning');
+      setWarningMessage(updatedWarning || '');
+    };
+
+    window.addEventListener('warningUpdated', handleWarningUpdate);
+    return () => window.removeEventListener('warningUpdated', handleWarningUpdate);
   }, []);
 
   const handleAuth = (userData: any) => {

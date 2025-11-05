@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -11,25 +11,23 @@ const WarningEditor = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSave = async () => {
+  useEffect(() => {
+    const savedWarning = localStorage.getItem('siteWarning');
+    if (savedWarning) {
+      setWarning(savedWarning);
+    }
+  }, []);
+
+  const handleSave = () => {
     setLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=updateWarning', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ warning }),
+      localStorage.setItem('siteWarning', warning);
+      window.dispatchEvent(new Event('warningUpdated'));
+      
+      toast({
+        title: "Предупреждение обновлено",
+        description: "Сообщение успешно сохранено",
       });
-
-      if (response.ok) {
-        toast({
-          title: "Предупреждение обновлено",
-          description: "Сообщение успешно сохранено",
-        });
-      } else {
-        throw new Error('Failed to update');
-      }
     } catch (error) {
       toast({
         title: "Ошибка",
