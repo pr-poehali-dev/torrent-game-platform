@@ -226,7 +226,6 @@ const Index = () => {
               <div className="flex items-center gap-3 mb-6">
                 <Icon name="Gamepad2" className="text-primary" size={24} />
                 <h2 className="text-2xl font-bold">Поддерживается Steam Deck</h2>
-                <Badge variant="secondary" className="ml-2">Verified</Badge>
               </div>
               <TorrentGrid 
                 torrents={steamDeckGames}
