@@ -91,7 +91,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
           <span className="font-medium">На главную</span>
         </button>
 
-        <div className="mt-4 pt-4 border-t border-border">
+        <div className="mt-4 pt-4 border-t border-border space-y-2">
           <button
             onClick={() => setActiveTab('functions')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
@@ -102,6 +102,18 @@ const AdminSidebar = ({ activeTab, setActiveTab, torrentsCount, usersCount, onLo
           >
             <Icon name="FolderPlus" size={16} />
             <span className="text-sm">Добавить категорию</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('warning')}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              activeTab === 'warning' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'hover:bg-secondary'
+            }`}
+          >
+            <Icon name="AlertTriangle" size={16} />
+            <span className="text-sm">Предупреждение</span>
           </button>
         </div>
       </nav>

@@ -8,6 +8,7 @@ import TorrentsTable from "@/components/admin/TorrentsTable";
 import UsersTable from "@/components/admin/UsersTable";
 import DeleteConfirmDialog from "@/components/admin/DeleteConfirmDialog";
 import AdminFunctions from "@/components/admin/AdminFunctions";
+import WarningEditor from "@/components/admin/WarningEditor";
 import Icon from "@/components/ui/icon";
 
 const AdminDashboard = () => {
@@ -358,6 +359,10 @@ const AdminDashboard = () => {
 
             {activeTab === 'functions' && (
               <AdminFunctions />
+            )}
+
+            {activeTab === 'warning' && (
+              <WarningEditor />
             )}
           </div>
 

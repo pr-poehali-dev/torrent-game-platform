@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import TelegramAuth from "@/components/TelegramAuth";
 import {
   NavigationMenu,
@@ -42,6 +43,7 @@ const Index = () => {
     users: "0",
     comments: "0"
   });
+  const [warningMessage, setWarningMessage] = useState("");
 
   useEffect(() => {
     fetchTorrents();
@@ -96,6 +98,9 @@ const Index = () => {
         users: data.users.toLocaleString('ru-RU'),
         comments: data.comments.toLocaleString('ru-RU')
       });
+      if (data.warning) {
+        setWarningMessage(data.warning);
+      }
     } catch (error) {
       console.error('Ошибка загрузки статистики:', error);
     }
@@ -257,6 +262,15 @@ const Index = () => {
             </CardContent>
           </Card>
         </div>
+
+        {warningMessage && (
+          <Alert className="mb-8 border-yellow-500/50 bg-yellow-500/10">
+            <Icon name="AlertTriangle" className="h-4 w-4 text-yellow-500" />
+            <AlertDescription className="text-yellow-600 dark:text-yellow-400">
+              {warningMessage}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <section className="mb-16 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center gap-3 mb-6">
