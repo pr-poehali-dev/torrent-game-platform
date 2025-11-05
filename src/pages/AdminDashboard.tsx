@@ -247,31 +247,34 @@ const AdminDashboard = () => {
   const handleFileUpload = async (file: File) => {
     setUploadingPoster(true);
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
-
-      const response = await fetch('https://api.poehali.dev/upload-image', {
-        method: 'POST',
-        body: formDataUpload,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setFormData(prev => ({ ...prev, poster: data.url }));
+      const reader = new FileReader();
+      
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setFormData(prev => ({ ...prev, poster: base64String }));
         toast({
           title: "Постер загружен",
           description: "Изображение успешно загружено",
         });
-      } else {
-        throw new Error('Upload failed');
-      }
+        setUploadingPoster(false);
+      };
+
+      reader.onerror = () => {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить изображение",
+          variant: "destructive",
+        });
+        setUploadingPoster(false);
+      };
+
+      reader.readAsDataURL(file);
     } catch (error) {
       toast({
         title: "Ошибка",
         description: "Не удалось загрузить изображение",
         variant: "destructive",
       });
-    } finally {
       setUploadingPoster(false);
     }
   };
