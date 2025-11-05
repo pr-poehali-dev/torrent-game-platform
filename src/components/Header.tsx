@@ -50,6 +50,10 @@ const Header = ({ user, handleAuth, handleLogout }: HeaderProps) => {
                       {user.username && <span className="text-xs text-muted-foreground">@{user.username}</span>}
                     </div>
                   </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Icon name="User" size={16} className="mr-2" />
+                    Изменить профиль
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <Icon name="LogOut" size={16} className="mr-2" />
                     Выйти
