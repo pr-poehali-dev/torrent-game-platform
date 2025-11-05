@@ -35,23 +35,24 @@ const TorrentGrid = ({ torrents, formatDownloads, getCategoryIcon }: TorrentGrid
               alt={torrent.title}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
             />
-            <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
+          </div>
+          <CardContent className="p-4 space-y-3">
+            <h3 className="font-semibold text-sm truncate">{torrent.title}</h3>
+            
+            <div className="flex flex-wrap gap-2">
               {torrent.category && torrent.category.length > 0 && torrent.category.map((cat, idx) => (
-                <Badge key={idx} className="bg-primary/90 backdrop-blur-sm">
+                <Badge key={idx} variant="secondary">
                   <Icon name={getCategoryIcon(cat)} size={12} className="mr-1" />
                   {cat}
                 </Badge>
               ))}
               {torrent.steamDeck && (
-                <Badge className="bg-green-500/90 backdrop-blur-sm">
+                <Badge className="bg-green-500 text-white">
                   <Icon name="Gamepad2" size={12} className="mr-1" />
                   Deck
                 </Badge>
               )}
             </div>
-          </div>
-          <CardContent className="p-4 space-y-3">
-            <h3 className="font-semibold text-sm truncate">{torrent.title}</h3>
             
             <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs">
               <div className="flex items-center gap-1">
