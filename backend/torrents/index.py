@@ -108,13 +108,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
         
         elif action == 'stats' and method == 'GET':
-            cur.execute("SELECT COUNT(*) FROM torrents")
+            cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.torrents")
             games_count = cur.fetchone()[0]
             
-            cur.execute("SELECT COUNT(*) FROM users")
+            cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.users")
             users_count = cur.fetchone()[0]
             
-            cur.execute("SELECT COUNT(*) FROM comments")
+            cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.comments")
             comments_count = cur.fetchone()[0]
             
             stats = {
@@ -208,10 +208,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             size = float(body_data.get('size'))
             category = body_data.get('category')
             description = body_data.get('description', '')
+            steam_deck = body_data.get('steamDeck', False)
             
             cur.execute(
-                "UPDATE torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s WHERE id = %s",
-                (title, poster, downloads, size, category, description, torrent_id)
+                "UPDATE t_p88186320_torrent_game_platfor.torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s, steam_deck = %s WHERE id = %s",
+                (title, poster, downloads, size, category, description, steam_deck, torrent_id)
             )
             conn.commit()
             
