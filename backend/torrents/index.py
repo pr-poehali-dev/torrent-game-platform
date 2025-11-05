@@ -9,15 +9,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from datetime import datetime
 
-# Initialize Firebase
-if not firebase_admin._apps:
-    cred_json = os.environ.get('FIREBASE_CREDENTIALS')
-    if cred_json:
-        cred_dict = json.loads(cred_json)
-        cred = credentials.Certificate(cred_dict)
-        firebase_admin.initialize_app(cred)
-
-db = firestore.client()
+# Initialize Firebase (will be done in handler)
 
 def hash_password(password: str) -> str:
     """Hash password using SHA256"""
@@ -107,6 +99,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
           context - object с request_id, function_name
     Returns: HTTP response dict с данными торрентов, статистикой или данными из Steam
     '''
+    # Initialize Firebase
+    cred_json = os.environ.get('FIREBASE_CREDENTIALS', '')
+    
+    if not firebase_admin._apps:
+        if not cred_json or cred_json.strip() == '':
+            return {
+                'statusCode': 503,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'error': 'Firebase credentials not configured. Please add FIREBASE_CREDENTIALS secret.',
+                    'hint': 'Add the JSON service account key from Firebase Console'
+                })
+            }
+        try:
+            cred_dict = json.loads(cred_json)
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred)
+        except json.JSONDecodeError as e:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'error': 'Invalid Firebase credentials JSON format',
+                    'details': str(e)
+                })
+            }
+    
+    db = firestore.client()
+    
     method: str = event.get('httpMethod', 'GET')
     query_params = event.get('queryStringParameters', {}) or {}
     path_params = event.get('pathParams', {}) or {}
@@ -134,6 +157,85 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False,
             'body': ''
         }
+    
+    if action == 'migrate' and method == 'POST':
+        try:
+            # Data from PostgreSQL
+            categories_data = [
+                {'name': 'RPG', 'slug': 'RPG', 'icon': 'Sword'},
+                {'name': 'Экшен', 'slug': 'Action', 'icon': 'Zap'},
+                {'name': 'Гонки', 'slug': 'Racing', 'icon': 'Car'}
+            ]
+            
+            users_data = [
+                {
+                    'username': 'Kot',
+                    'email': 'igorkochetkow@yandex.ru',
+                    'password_hash': '497c0f6767166ad2242e9266d9ce34409ac43cd2a9e22b548aa7b1a6329a68d7',
+                    'avatar': 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kot',
+                    'first_name': 'Kot',
+                    'created_at': '2025-11-05T16:27:55.463905',
+                    'is_admin': False
+                }
+            ]
+            
+            torrents_data = [
+                {
+                    'title': 'Counter-Strike 2',
+                    'poster': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/ss_0f8cf82d019c614760fd20801f2bb4001da7ea77.1920x1080.jpg?t=1749053861',
+                    'downloads': 0,
+                    'size': 16.0,
+                    'category': ['action', 'RPG'],
+                    'description': 'Более двух десятилетий Counter-Strike служит примером первоклассной соревновательной игры, путь развития которой определяют миллионы игроков со всего мира. Теперь пришло время нового этапа — Counter-Strike 2.',
+                    'steam_deck': True,
+                    'steam_rating': 4755307,
+                    'metacritic_score': None
+                }
+            ]
+            
+            results = {
+                'categories': [],
+                'users': [],
+                'torrents': []
+            }
+            
+            # Migrate categories
+            for cat in categories_data:
+                doc_ref = db.collection('categories').add(cat)
+                results['categories'].append({'name': cat['name'], 'id': doc_ref[1].id})
+            
+            # Migrate users
+            for user in users_data:
+                doc_ref = db.collection('users').add(user)
+                results['users'].append({'username': user['username'], 'id': doc_ref[1].id})
+            
+            # Migrate torrents
+            for torrent in torrents_data:
+                doc_ref = db.collection('torrents').add(torrent)
+                results['torrents'].append({'title': torrent['title'], 'id': doc_ref[1].id})
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'success': True,
+                    'message': 'Миграция завершена успешно',
+                    'migrated': {
+                        'categories': len(results['categories']),
+                        'users': len(results['users']),
+                        'torrents': len(results['torrents'])
+                    },
+                    'details': results
+                }, ensure_ascii=False)
+            }
+        except Exception as e:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({'error': f'Ошибка миграции: {str(e)}'})
+            }
     
     if action == 'steam' and method == 'GET':
         url_or_id = query_params.get('url') or query_params.get('appId')
