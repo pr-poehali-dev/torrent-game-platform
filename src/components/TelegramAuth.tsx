@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import Icon from "@/components/ui/icon";
+import { useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface TelegramAuthProps {
@@ -9,24 +7,16 @@ interface TelegramAuthProps {
 
 declare global {
   interface Window {
-    TelegramLoginWidget?: any;
     onTelegramAuth?: (user: any) => void;
   }
 }
 
 const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-widget.js?22";
-    script.async = true;
-    document.body.appendChild(script);
-
     window.onTelegramAuth = (user: any) => {
-      setLoading(true);
-
       const userData = {
         telegram_id: user.id,
         username: user.username || "",
@@ -44,43 +34,21 @@ const TelegramAuth = ({ onAuth }: TelegramAuthProps) => {
       });
 
       onAuth(userData);
-      setLoading(false);
     };
 
-    return () => {
-      document.body.removeChild(script);
-    };
+    if (containerRef.current && !containerRef.current.hasChildNodes()) {
+      const script = document.createElement("script");
+      script.src = "https://telegram.org/js/telegram-widget.js?22";
+      script.async = true;
+      script.setAttribute("data-telegram-login", "Torrtop_bot");
+      script.setAttribute("data-size", "large");
+      script.setAttribute("data-onauth", "onTelegramAuth(user)");
+      script.setAttribute("data-request-access", "write");
+      containerRef.current.appendChild(script);
+    }
   }, [onAuth, toast]);
 
-  const handleTelegramLogin = () => {
-    const botUsername = "Torrtop_bot";
-    const currentDomain = window.location.hostname;
-    const width = 600;
-    const height = 700;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-
-    window.open(
-      `https://oauth.telegram.org/auth?bot_id=8213964528&origin=${encodeURIComponent(window.location.origin)}&embed=1&request_access=write&return_to=${encodeURIComponent(window.location.origin)}`,
-      "telegram-login",
-      `width=${width},height=${height},left=${left},top=${top}`,
-    );
-  };
-
-  return (
-    <Button
-      onClick={handleTelegramLogin}
-      disabled={loading}
-      variant="outline"
-      size="icon"
-    >
-      <Icon
-        name={loading ? "Loader2" : "Send"}
-        size={20}
-        className={loading ? "animate-spin" : ""}
-      />
-    </Button>
-  );
+  return <div ref={containerRef}></div>;
 };
 
 export default TelegramAuth;
