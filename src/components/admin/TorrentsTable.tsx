@@ -157,6 +157,21 @@ const TorrentsTable = ({ torrents, editingTorrent, setEditingTorrent, onUpdate, 
                                     required
                                   />
                                 </div>
+                                <div className="space-y-2">
+                                  <Label>Steam Deck</Label>
+                                  <Select 
+                                    value={editingTorrent.steamDeck ? "yes" : "no"} 
+                                    onValueChange={(value) => setEditingTorrent({...editingTorrent, steamDeck: value === "yes"})}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="yes">Да</SelectItem>
+                                      <SelectItem value="no">Нет</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </div>
                               <div className="space-y-2">
                                 <Label>Описание</Label>

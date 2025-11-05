@@ -302,15 +302,26 @@ const Index = () => {
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <Badge className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/90 backdrop-blur-sm">
-                    {torrent.size} ГБ
-                  </Badge>
+                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                    <Badge className="bg-primary/90 backdrop-blur-sm">
+                      {torrent.category}
+                    </Badge>
+                    {torrent.steamDeck && (
+                      <Badge className="bg-green-500/90 backdrop-blur-sm">
+                        <Icon name="Gamepad2" size={12} className="mr-1" />
+                        Deck
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
-                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                    <Icon name="Download" size={14} />
-                    <span>{formatDownloads(torrent.downloads)}</span>
+                  <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs">
+                    <div className="flex items-center gap-1">
+                      <Icon name="Download" size={14} />
+                      <span>{formatDownloads(torrent.downloads)}</span>
+                    </div>
+                    <span>{torrent.size} ГБ</span>
                   </div>
                 </CardContent>
               </Card>
@@ -336,15 +347,26 @@ const Index = () => {
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <Badge className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/90 backdrop-blur-sm">
-                    {torrent.size} ГБ
-                  </Badge>
+                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                    <Badge className="bg-primary/90 backdrop-blur-sm">
+                      {torrent.category}
+                    </Badge>
+                    {torrent.steamDeck && (
+                      <Badge className="bg-green-500/90 backdrop-blur-sm">
+                        <Icon name="Gamepad2" size={12} className="mr-1" />
+                        Deck
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
-                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                    <Icon name="Download" size={14} />
-                    <span>{formatDownloads(torrent.downloads)}</span>
+                  <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs">
+                    <div className="flex items-center gap-1">
+                      <Icon name="Download" size={14} />
+                      <span>{formatDownloads(torrent.downloads)}</span>
+                    </div>
+                    <span>{torrent.size} ГБ</span>
                   </div>
                 </CardContent>
               </Card>
@@ -369,15 +391,26 @@ const Index = () => {
                     alt={torrent.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <Badge className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/90 backdrop-blur-sm">
-                    {torrent.size} ГБ
-                  </Badge>
+                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                    <Badge className="bg-primary/90 backdrop-blur-sm">
+                      {torrent.category}
+                    </Badge>
+                    {torrent.steamDeck && (
+                      <Badge className="bg-green-500/90 backdrop-blur-sm">
+                        <Icon name="Gamepad2" size={12} className="mr-1" />
+                        Deck
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
-                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                    <Icon name="Download" size={14} />
-                    <span>{formatDownloads(torrent.downloads)}</span>
+                  <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs">
+                    <div className="flex items-center gap-1">
+                      <Icon name="Download" size={14} />
+                      <span>{formatDownloads(torrent.downloads)}</span>
+                    </div>
+                    <span>{torrent.size} ГБ</span>
                   </div>
                 </CardContent>
               </Card>
