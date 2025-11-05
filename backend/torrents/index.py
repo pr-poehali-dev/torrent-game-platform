@@ -170,7 +170,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         if action == 'categories' and method == 'GET':
-            cur.execute("SELECT id, name, slug FROM t_p88186320_torrent_game_platfor.categories ORDER BY name")
+            cur.execute("SELECT id, name, slug, icon FROM t_p88186320_torrent_game_platfor.categories ORDER BY name")
             rows = cur.fetchall()
             categories = []
             for row in rows:
@@ -180,6 +180,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'id': row[0],
                     'name': row[1],
                     'slug': row[2],
+                    'icon': row[3] if len(row) > 3 else 'Gamepad2',
                     'count': count
                 })
             
@@ -197,10 +198,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_data = json.loads(event.get('body', '{}'))
             name = body_data.get('name')
             slug = body_data.get('slug')
+            icon = body_data.get('icon', 'Gamepad2')
             
             cur.execute(
-                "INSERT INTO t_p88186320_torrent_game_platfor.categories (name, slug) VALUES (%s, %s) RETURNING id",
-                (name, slug)
+                "INSERT INTO t_p88186320_torrent_game_platfor.categories (name, slug, icon) VALUES (%s, %s, %s) RETURNING id",
+                (name, slug, icon)
             )
             category_id = cur.fetchone()[0]
             conn.commit()

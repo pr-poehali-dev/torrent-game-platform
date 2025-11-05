@@ -130,20 +130,9 @@ const Index = () => {
     return num.toLocaleString('ru-RU');
   };
 
-  const getCategoryIcon = (category: string) => {
-    const icons: Record<string, string> = {
-      action: 'Sword',
-      adventure: 'Map',
-      rpg: 'Wand2',
-      strategy: 'Brain',
-      shooter: 'Target',
-      indie: 'Sparkles',
-      multiplayer: 'Users',
-      sports: 'Trophy',
-      racing: 'Car',
-      simulation: 'Cog'
-    };
-    return icons[category] || 'Folder';
+  const getCategoryIcon = (categorySlug: string) => {
+    const cat = categories.find(c => c.slug === categorySlug);
+    return cat?.icon || 'Gamepad2';
   };
 
   const handleApplyFilters = () => {

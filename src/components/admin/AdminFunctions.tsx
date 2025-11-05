@@ -17,7 +17,27 @@ import {
 const AdminFunctions = () => {
   const { toast } = useToast();
   const [categories, setCategories] = useState<any[]>([]);
-  const [newCategory, setNewCategory] = useState({ name: "", slug: "" });
+  const [newCategory, setNewCategory] = useState({ name: "", slug: "", icon: "Gamepad2" });
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  
+  const availableIcons = [
+    { name: 'Gamepad2', label: 'Игры' },
+    { name: 'Zap', label: 'Экшен' },
+    { name: 'Sword', label: 'РПГ' },
+    { name: 'Brain', label: 'Стратегия' },
+    { name: 'Target', label: 'Шутер' },
+    { name: 'Compass', label: 'Приключения' },
+    { name: 'Car', label: 'Гонки' },
+    { name: 'Trophy', label: 'Спорт' },
+    { name: 'Cpu', label: 'Симулятор' },
+    { name: 'Puzzle', label: 'Головоломка' },
+    { name: 'Ghost', label: 'Хоррор' },
+    { name: 'Lightbulb', label: 'Инди' },
+    { name: 'Users', label: 'ММО' },
+    { name: 'Sparkles', label: 'Казуальная' },
+    { name: 'Dumbbell', label: 'Файтинг' },
+    { name: 'Music', label: 'Музыкальная' },
+  ];
 
   useEffect(() => {
     fetchCategories();
@@ -48,7 +68,8 @@ const AdminFunctions = () => {
             title: "Категория добавлена",
             description: `Категория "${newCategory.name}" успешно добавлена`,
           });
-          setNewCategory({ name: "", slug: "" });
+          setNewCategory({ name: "", slug: "", icon: "Gamepad2" });
+          setShowIconPicker(false);
           fetchCategories();
         }
       } catch (error) {
@@ -114,6 +135,43 @@ const AdminFunctions = () => {
                 />
               </div>
             </div>
+            
+            <div className="space-y-2">
+              <Label>Иконка категории</Label>
+              <div className="relative">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowIconPicker(!showIconPicker)}
+                  className="w-full justify-start"
+                >
+                  <Icon name={newCategory.icon} size={18} className="mr-2" />
+                  {availableIcons.find(i => i.name === newCategory.icon)?.label || newCategory.icon}
+                  <Icon name="ChevronDown" size={16} className="ml-auto" />
+                </Button>
+                
+                {showIconPicker && (
+                  <div className="absolute z-50 w-full mt-2 p-2 bg-card border border-border rounded-lg shadow-lg grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
+                    {availableIcons.map((iconOption) => (
+                      <button
+                        key={iconOption.name}
+                        type="button"
+                        onClick={() => {
+                          setNewCategory({ ...newCategory, icon: iconOption.name });
+                          setShowIconPicker(false);
+                        }}
+                        className={`p-3 rounded-lg border-2 transition-all hover:border-primary flex flex-col items-center gap-1 ${
+                          newCategory.icon === iconOption.name ? 'border-primary bg-primary/10' : 'border-border'
+                        }`}
+                      >
+                        <Icon name={iconOption.name} size={24} />
+                        <span className="text-[10px] text-center">{iconOption.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
             <Button type="submit" className="w-full md:w-auto">
               <Icon name="Plus" size={18} className="mr-2" />
               Добавить категорию
@@ -135,6 +193,7 @@ const AdminFunctions = () => {
               <TableHeader>
                 <TableRow className="bg-secondary/50">
                   <TableHead>ID</TableHead>
+                  <TableHead>Иконка</TableHead>
                   <TableHead>Название</TableHead>
                   <TableHead>Slug</TableHead>
                   <TableHead>Количество игр</TableHead>
@@ -145,6 +204,9 @@ const AdminFunctions = () => {
                 {categories.map((category) => (
                   <TableRow key={category.id}>
                     <TableCell className="font-mono">{category.id}</TableCell>
+                    <TableCell>
+                      <Icon name={category.icon || 'Gamepad2'} size={20} className="text-primary" />
+                    </TableCell>
                     <TableCell className="font-medium">{category.name}</TableCell>
                     <TableCell>
                       <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm font-mono">

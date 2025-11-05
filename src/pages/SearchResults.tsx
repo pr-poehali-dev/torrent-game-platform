@@ -12,11 +12,13 @@ const SearchResults = () => {
   const query = searchParams.get('q') || '';
   
   const [allTorrents, setAllTorrents] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     fetchTorrents();
+    fetchCategories();
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -35,6 +37,16 @@ const SearchResults = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=categories');
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.error('Ошибка загрузки категорий:', error);
+    }
+  };
+
   const handleAuth = () => {
     navigate('/auth');
   };
@@ -44,22 +56,9 @@ const SearchResults = () => {
     setUser(null);
   };
 
-  const getCategoryIcon = (category: string): string => {
-    const iconMap: { [key: string]: string } = {
-      'action': 'Zap',
-      'rpg': 'Sword',
-      'strategy': 'Brain',
-      'shooter': 'Target',
-      'adventure': 'Compass',
-      'racing': 'Car',
-      'sports': 'Trophy',
-      'simulation': 'Cpu',
-      'puzzle': 'PuzzlePiece',
-      'horror': 'Ghost',
-      'indie': 'Lightbulb',
-      'mmo': 'Users'
-    };
-    return iconMap[category] || 'Gamepad2';
+  const getCategoryIcon = (categorySlug: string): string => {
+    const cat = categories.find(c => c.slug === categorySlug);
+    return cat?.icon || 'Gamepad2';
   };
 
   const formatDownloads = (downloads: number): string => {
