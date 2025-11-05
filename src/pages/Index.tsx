@@ -278,7 +278,7 @@ const Index = () => {
 
         {warningMessage && (
           <Alert className="mb-8 border-yellow-500/50 bg-yellow-500/10">
-            <Icon name="AlertTriangle" className="h-4 w-4 text-yellow-500" />
+            <Icon name="AlertTriangle" className="h-4 w-4 !text-yellow-500" />
             <AlertDescription className="text-yellow-600 dark:text-yellow-400">
               {warningMessage}
             </AlertDescription>
