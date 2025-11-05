@@ -12,10 +12,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
     method: str = event.get('httpMethod', 'GET')
     query_params = event.get('queryStringParameters', {}) or {}
+    path_params = event.get('pathParams', {}) or {}
+    url = event.get('url', '')
     
     action = query_params.get('action', '')
     
-    print(f"DEBUG: method={method}, action={action}, query_params={query_params}")
+    if not action and url:
+        path_parts = url.strip('/').split('/')
+        if len(path_parts) > 0:
+            action = path_parts[-1]
+    
+    print(f"DEBUG: method={method}, action={action}, query_params={query_params}, url={url}, path_params={path_params}")
     
     if method == 'OPTIONS':
         return {
@@ -146,15 +153,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif action == 'users' and method == 'GET':
-            cur.execute("SELECT id, username, email, created_at FROM t_p88186320_torrent_game_platfor.users ORDER BY created_at DESC")
+            cur.execute("SELECT id, username, created_at FROM t_p88186320_torrent_game_platfor.users ORDER BY created_at DESC")
             rows = cur.fetchall()
             users = []
             for row in rows:
                 users.append({
                     'id': row[0],
                     'username': row[1],
-                    'email': row[2],
-                    'created_at': row[3].isoformat() if row[3] else None
+                    'email': '',
+                    'created_at': row[2].isoformat() if row[2] else None
                 })
             
             return {
