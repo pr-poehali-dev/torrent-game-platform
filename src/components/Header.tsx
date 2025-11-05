@@ -37,16 +37,16 @@ const Header = ({ user, onOpenAuth, handleLogout }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <Avatar>
-                      <AvatarImage src={user.photo_url} />
-                      <AvatarFallback>{user.first_name?.[0] || 'U'}</AvatarFallback>
+                      <AvatarImage src={user.avatar || user.photo_url} />
+                      <AvatarFallback>{user.first_name?.[0] || user.username?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem disabled>
                     <div className="flex flex-col">
-                      <span className="font-medium">{user.first_name} {user.last_name}</span>
-                      {user.username && <span className="text-xs text-muted-foreground">@{user.username}</span>}
+                      <span className="font-medium">{user.first_name || user.username}</span>
+                      {user.email && <span className="text-xs text-muted-foreground">{user.email}</span>}
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem>

@@ -29,27 +29,48 @@ const AuthModal = ({ open, onOpenChange, onAuth }: AuthModalProps) => {
     e.preventDefault();
     setLoading(true);
 
-    setTimeout(() => {
-      const userData = {
-        id: Date.now(),
-        username: loginData.email.split('@')[0],
-        email: loginData.email,
-        first_name: "Пользователь",
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${loginData.email}`
-      };
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'login',
+          email: loginData.email,
+          password: loginData.password
+        })
+      });
 
-      localStorage.setItem("user", JSON.stringify(userData));
-      localStorage.setItem("authToken", `user_${userData.id}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast({
+          title: "Ошибка входа",
+          description: data.error || "Не удалось войти",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("authToken", data.token);
 
       toast({
         title: "Вход выполнен",
-        description: `Добро пожаловать, ${userData.first_name}!`,
+        description: `Добро пожаловать, ${data.user.first_name}!`,
       });
 
-      onAuth(userData);
+      onAuth(data.user);
       onOpenChange(false);
       setLoading(false);
-    }, 1000);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось подключиться к серверу",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -66,27 +87,49 @@ const AuthModal = ({ open, onOpenChange, onAuth }: AuthModalProps) => {
 
     setLoading(true);
 
-    setTimeout(() => {
-      const userData = {
-        id: Date.now(),
-        username: registerData.username,
-        email: registerData.email,
-        first_name: registerData.username,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${registerData.username}`
-      };
+    try {
+      const response = await fetch('https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'register',
+          username: registerData.username,
+          email: registerData.email,
+          password: registerData.password
+        })
+      });
 
-      localStorage.setItem("user", JSON.stringify(userData));
-      localStorage.setItem("authToken", `user_${userData.id}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast({
+          title: "Ошибка регистрации",
+          description: data.error || "Не удалось зарегистрироваться",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("authToken", data.token);
 
       toast({
         title: "Регистрация успешна",
-        description: `Добро пожаловать, ${userData.first_name}!`,
+        description: `Добро пожаловать, ${data.user.first_name}!`,
       });
 
-      onAuth(userData);
+      onAuth(data.user);
       onOpenChange(false);
       setLoading(false);
-    }, 1000);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось подключиться к серверу",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
   };
 
   return (

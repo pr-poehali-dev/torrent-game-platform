@@ -3,8 +3,13 @@ import os
 import re
 import urllib.request
 import urllib.parse
+import hashlib
 import psycopg2
 from typing import Dict, Any, Optional
+
+def hash_password(password: str) -> str:
+    """Hash password using SHA256"""
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def extract_app_id(url: str) -> Optional[str]:
     """Extract Steam App ID from URL"""
@@ -169,7 +174,123 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur = conn.cursor()
     
     try:
-        if action == 'categories' and method == 'GET':
+        if action == 'auth' and method == 'POST':
+            body_data = json.loads(event.get('body', '{}'))
+            auth_action = body_data.get('action', 'login')
+            
+            if auth_action == 'register':
+                username = body_data.get('username', '').strip()
+                email = body_data.get('email', '').strip()
+                password = body_data.get('password', '')
+                
+                if not username or not email or not password:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'isBase64Encoded': False,
+                        'body': json.dumps({'error': 'Все поля обязательны для заполнения'})
+                    }
+                
+                cur.execute(
+                    "SELECT id FROM t_p88186320_torrent_game_platfor.users WHERE email = %s OR username = %s",
+                    (email, username)
+                )
+                existing_user = cur.fetchone()
+                
+                if existing_user:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'isBase64Encoded': False,
+                        'body': json.dumps({'error': 'Пользователь с таким email или username уже существует'})
+                    }
+                
+                password_hash = hash_password(password)
+                avatar = f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}"
+                
+                cur.execute(
+                    """INSERT INTO t_p88186320_torrent_game_platfor.users 
+                       (username, email, password_hash, avatar, first_name) 
+                       VALUES (%s, %s, %s, %s, %s) 
+                       RETURNING id, username, email, avatar, first_name, created_at""",
+                    (username, email, password_hash, avatar, username)
+                )
+                
+                user_row = cur.fetchone()
+                conn.commit()
+                
+                user_data = {
+                    'id': user_row[0],
+                    'username': user_row[1],
+                    'email': user_row[2],
+                    'avatar': user_row[3],
+                    'first_name': user_row[4],
+                    'created_at': user_row[5].isoformat() if user_row[5] else None
+                }
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'isBase64Encoded': False,
+                    'body': json.dumps({
+                        'success': True,
+                        'user': user_data,
+                        'token': f"user_{user_data['id']}"
+                    })
+                }
+            
+            elif auth_action == 'login':
+                email = body_data.get('email', '').strip()
+                password = body_data.get('password', '')
+                
+                if not email or not password:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'isBase64Encoded': False,
+                        'body': json.dumps({'error': 'Email и пароль обязательны'})
+                    }
+                
+                password_hash = hash_password(password)
+                
+                cur.execute(
+                    """SELECT id, username, email, avatar, first_name, created_at 
+                       FROM t_p88186320_torrent_game_platfor.users 
+                       WHERE email = %s AND password_hash = %s""",
+                    (email, password_hash)
+                )
+                
+                user_row = cur.fetchone()
+                
+                if not user_row:
+                    return {
+                        'statusCode': 401,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'isBase64Encoded': False,
+                        'body': json.dumps({'error': 'Неверный email или пароль'})
+                    }
+                
+                user_data = {
+                    'id': user_row[0],
+                    'username': user_row[1],
+                    'email': user_row[2],
+                    'avatar': user_row[3],
+                    'first_name': user_row[4],
+                    'created_at': user_row[5].isoformat() if user_row[5] else None
+                }
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'isBase64Encoded': False,
+                    'body': json.dumps({
+                        'success': True,
+                        'user': user_data,
+                        'token': f"user_{user_data['id']}"
+                    })
+                }
+        
+        elif action == 'categories' and method == 'GET':
             cur.execute("SELECT id, name, slug, icon FROM t_p88186320_torrent_game_platfor.categories ORDER BY name")
             rows = cur.fetchall()
             categories = []
