@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,37 @@ interface AddTorrentFormProps {
 }
 
 const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload, uploadingPoster }: AddTorrentFormProps) => {
+  const [steamUrl, setSteamUrl] = useState("");
+  const [loadingSteam, setLoadingSteam] = useState(false);
+
+  const handleSteamParse = async () => {
+    if (!steamUrl.trim()) return;
+    
+    setLoadingSteam(true);
+    try {
+      const response = await fetch(
+        `https://functions.poehali.dev/666e4a26-f33a-4f88-b3b1-d9aaa5b427ae?action=steam&url=${encodeURIComponent(steamUrl)}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Не удалось загрузить данные из Steam');
+      }
+      
+      const data = await response.json();
+      
+      onChange("title", data.name || "");
+      onChange("poster", data.headerImage || "");
+      onChange("description", data.description || "");
+      
+      setSteamUrl("");
+    } catch (error) {
+      console.error('Ошибка загрузки из Steam:', error);
+      alert('Не удалось загрузить данные из Steam. Проверьте ссылку.');
+    } finally {
+      setLoadingSteam(false);
+    }
+  };
+
   return (
     <Card className="bg-card border-border">
       <CardHeader>
@@ -32,6 +64,41 @@ const AddTorrentForm = ({ formData, categories, onSubmit, onChange, onFileUpload
         </CardTitle>
       </CardHeader>
       <CardContent>
+        <div className="mb-6 p-4 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5">
+          <Label htmlFor="steamUrl" className="text-base font-semibold mb-2 flex items-center gap-2">
+            <Icon name="Link" size={18} />
+            Автозаполнение из Steam
+          </Label>
+          <p className="text-sm text-muted-foreground mb-3">
+            Вставьте ссылку на игру из Steam Store, и данные подтянутся автоматически
+          </p>
+          <div className="flex gap-2">
+            <Input
+              id="steamUrl"
+              type="url"
+              placeholder="https://store.steampowered.com/app/1234567/Game_Name"
+              value={steamUrl}
+              onChange={(e) => setSteamUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSteamParse();
+                }
+              }}
+              className="bg-background border-border"
+              disabled={loadingSteam}
+            />
+            <Button 
+              type="button" 
+              onClick={handleSteamParse}
+              disabled={!steamUrl.trim() || loadingSteam}
+            >
+              <Icon name={loadingSteam ? "Loader2" : "Download"} size={18} className={loadingSteam ? "mr-2 animate-spin" : "mr-2"} />
+              {loadingSteam ? "Загрузка..." : "Загрузить"}
+            </Button>
+          </div>
+        </div>
+
         <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6">
           <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
