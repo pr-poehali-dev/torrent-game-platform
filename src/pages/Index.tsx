@@ -158,12 +158,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
         user={user}
         handleAuth={handleAuth}
         handleLogout={handleLogout}
-        categories={categories}
       />
 
       <main className="container mx-auto px-4 py-8">
