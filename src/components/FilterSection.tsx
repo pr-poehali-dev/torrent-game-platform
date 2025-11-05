@@ -88,7 +88,7 @@ const FilterSection = ({
               className="text-sm font-medium cursor-pointer flex items-center gap-2"
             >
               <Icon name="Gamepad2" size={16} className="text-green-500" />
-              Только игры с поддержкой Steam Deck
+              Поддержка Steam Deck
             </label>
           </div>
         </div>
