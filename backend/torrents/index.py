@@ -4,8 +4,20 @@ import re
 import urllib.request
 import urllib.parse
 import hashlib
-import psycopg2
 from typing import Dict, Any, Optional
+import firebase_admin
+from firebase_admin import credentials, firestore
+from datetime import datetime
+
+# Initialize Firebase
+if not firebase_admin._apps:
+    cred_json = os.environ.get('FIREBASE_CREDENTIALS')
+    if cred_json:
+        cred_dict = json.loads(cred_json)
+        cred = credentials.Certificate(cred_dict)
+        firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 def hash_password(password: str) -> str:
     """Hash password using SHA256"""
@@ -90,7 +102,7 @@ def fetch_steam_data(app_id: str) -> Dict[str, Any]:
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: API для управления торрентами, статистикой и парсинга данных из Steam
+    Business: API для управления торрентами через Firebase Firestore
     Args: event - dict с httpMethod, body, queryStringParameters, pathParams
           context - object с request_id, function_name
     Returns: HTTP response dict с данными торрентов, статистикой или данными из Steam
@@ -133,6 +145,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
+                'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Missing url or appId parameter'})
             }
         
@@ -145,6 +158,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
+                'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Invalid Steam URL or App ID'})
             }
         
@@ -167,12 +181,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
+                'isBase64Encoded': False,
                 'body': json.dumps({'error': f'Failed to fetch Steam data: {str(e)}'})
             }
-    
-    database_url = os.environ.get('DATABASE_URL')
-    conn = psycopg2.connect(database_url)
-    cur = conn.cursor()
     
     try:
         if action == 'auth' and method == 'POST':
@@ -192,13 +203,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'body': json.dumps({'error': 'Все поля обязательны для заполнения'})
                     }
                 
-                cur.execute(
-                    "SELECT id FROM t_p88186320_torrent_game_platfor.users WHERE email = %s OR username = %s",
-                    (email, username)
-                )
-                existing_user = cur.fetchone()
+                users_ref = db.collection('users')
+                existing_email = users_ref.where('email', '==', email).limit(1).get()
+                existing_username = users_ref.where('username', '==', username).limit(1).get()
                 
-                if existing_user:
+                if len(list(existing_email)) > 0 or len(list(existing_username)) > 0:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -209,26 +218,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 password_hash = hash_password(password)
                 avatar = f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}"
                 
-                cur.execute(
-                    """INSERT INTO t_p88186320_torrent_game_platfor.users 
-                       (username, email, password_hash, avatar, first_name) 
-                       VALUES (%s, %s, %s, %s, %s) 
-                       RETURNING id, username, email, avatar, first_name, created_at, is_admin""",
-                    (username, email, password_hash, avatar, username)
-                )
-                
-                user_row = cur.fetchone()
-                conn.commit()
-                
                 user_data = {
-                    'id': user_row[0],
-                    'username': user_row[1],
-                    'email': user_row[2],
-                    'avatar': user_row[3],
-                    'first_name': user_row[4],
-                    'created_at': user_row[5].isoformat() if user_row[5] else None,
-                    'is_admin': user_row[6] or False
+                    'username': username,
+                    'email': email,
+                    'password_hash': password_hash,
+                    'avatar': avatar,
+                    'first_name': username,
+                    'created_at': datetime.utcnow().isoformat(),
+                    'is_admin': False
                 }
+                
+                doc_ref = users_ref.add(user_data)
+                user_id = doc_ref[1].id
                 
                 return {
                     'statusCode': 200,
@@ -236,8 +237,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False,
                     'body': json.dumps({
                         'success': True,
-                        'user': user_data,
-                        'token': f"user_{user_data['id']}"
+                        'user': {
+                            'id': user_id,
+                            'username': username,
+                            'email': email,
+                            'avatar': avatar,
+                            'first_name': username,
+                            'created_at': user_data['created_at'],
+                            'is_admin': False
+                        },
+                        'token': f"user_{user_id}"
                     })
                 }
             
@@ -255,16 +264,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 password_hash = hash_password(password)
                 
-                cur.execute(
-                    """SELECT id, username, email, avatar, first_name, created_at, is_admin 
-                       FROM t_p88186320_torrent_game_platfor.users 
-                       WHERE email = %s AND password_hash = %s""",
-                    (email, password_hash)
-                )
+                users_ref = db.collection('users')
+                users_query = users_ref.where('email', '==', email).where('password_hash', '==', password_hash).limit(1).get()
                 
-                user_row = cur.fetchone()
+                users_list = list(users_query)
                 
-                if not user_row:
+                if len(users_list) == 0:
                     return {
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -272,15 +277,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'body': json.dumps({'error': 'Неверный email или пароль'})
                     }
                 
-                user_data = {
-                    'id': user_row[0],
-                    'username': user_row[1],
-                    'email': user_row[2],
-                    'avatar': user_row[3],
-                    'first_name': user_row[4],
-                    'created_at': user_row[5].isoformat() if user_row[5] else None,
-                    'is_admin': user_row[6] or False
-                }
+                user_doc = users_list[0]
+                user_data = user_doc.to_dict()
+                user_id = user_doc.id
                 
                 return {
                     'statusCode': 200,
@@ -288,28 +287,34 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False,
                     'body': json.dumps({
                         'success': True,
-                        'user': user_data,
-                        'token': f"user_{user_data['id']}"
+                        'user': {
+                            'id': user_id,
+                            'username': user_data.get('username'),
+                            'email': user_data.get('email'),
+                            'avatar': user_data.get('avatar'),
+                            'first_name': user_data.get('first_name'),
+                            'created_at': user_data.get('created_at'),
+                            'is_admin': user_data.get('is_admin', False)
+                        },
+                        'token': f"user_{user_id}"
                     })
                 }
         
         elif action == 'users' and method == 'GET':
-            cur.execute("""
-                SELECT id, username, email, avatar, first_name, created_at, is_admin 
-                FROM t_p88186320_torrent_game_platfor.users 
-                ORDER BY created_at DESC
-            """)
-            rows = cur.fetchall()
+            users_ref = db.collection('users').order_by('created_at', direction=firestore.Query.DESCENDING)
+            users_docs = users_ref.stream()
+            
             users = []
-            for row in rows:
+            for doc in users_docs:
+                user_data = doc.to_dict()
                 users.append({
-                    'id': row[0],
-                    'username': row[1],
-                    'email': row[2],
-                    'avatar': row[3],
-                    'first_name': row[4],
-                    'created_at': row[5].isoformat() if row[5] else None,
-                    'is_admin': row[6] or False
+                    'id': doc.id,
+                    'username': user_data.get('username'),
+                    'email': user_data.get('email'),
+                    'avatar': user_data.get('avatar'),
+                    'first_name': user_data.get('first_name'),
+                    'created_at': user_data.get('created_at'),
+                    'is_admin': user_data.get('is_admin', False)
                 })
             
             return {
@@ -332,11 +337,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_data = json.loads(event.get('body', '{}'))
             is_admin = body_data.get('is_admin', False)
             
-            cur.execute(
-                "UPDATE t_p88186320_torrent_game_platfor.users SET is_admin = %s WHERE id = %s",
-                (is_admin, user_id)
-            )
-            conn.commit()
+            db.collection('users').document(user_id).update({'is_admin': is_admin})
             
             return {
                 'statusCode': 200,
@@ -346,17 +347,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif action == 'categories' and method == 'GET':
-            cur.execute("SELECT id, name, slug, icon FROM t_p88186320_torrent_game_platfor.categories ORDER BY name")
-            rows = cur.fetchall()
+            categories_ref = db.collection('categories').order_by('name')
+            categories_docs = categories_ref.stream()
+            
             categories = []
-            for row in rows:
-                cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.torrents WHERE %s = ANY(category)", (row[2],))
-                count = cur.fetchone()[0]
+            for doc in categories_docs:
+                cat_data = doc.to_dict()
+                
+                torrents_ref = db.collection('torrents').where('category', 'array_contains', cat_data.get('slug')).stream()
+                count = len(list(torrents_ref))
+                
                 categories.append({
-                    'id': row[0],
-                    'name': row[1],
-                    'slug': row[2],
-                    'icon': row[3] if len(row) > 3 else 'Gamepad2',
+                    'id': doc.id,
+                    'name': cat_data.get('name'),
+                    'slug': cat_data.get('slug'),
+                    'icon': cat_data.get('icon', 'Gamepad2'),
                     'count': count
                 })
             
@@ -376,12 +381,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             slug = body_data.get('slug')
             icon = body_data.get('icon', 'Gamepad2')
             
-            cur.execute(
-                "INSERT INTO t_p88186320_torrent_game_platfor.categories (name, slug, icon) VALUES (%s, %s, %s) RETURNING id",
-                (name, slug, icon)
-            )
-            category_id = cur.fetchone()[0]
-            conn.commit()
+            doc_ref = db.collection('categories').add({
+                'name': name,
+                'slug': slug,
+                'icon': icon
+            })
+            category_id = doc_ref[1].id
             
             return {
                 'statusCode': 201,
@@ -401,11 +406,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 slug = body_data.get('slug')
                 icon = body_data.get('icon', 'Gamepad2')
                 
-                cur.execute(
-                    "UPDATE t_p88186320_torrent_game_platfor.categories SET name = %s, slug = %s, icon = %s WHERE id = %s",
-                    (name, slug, icon, category_id)
-                )
-                conn.commit()
+                db.collection('categories').document(category_id).update({
+                    'name': name,
+                    'slug': slug,
+                    'icon': icon
+                })
                 
                 return {
                     'statusCode': 200,
@@ -430,8 +435,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         elif action == 'categories' and method == 'DELETE':
             category_id = query_params.get('id')
             if category_id:
-                cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.categories WHERE id = %s", (category_id,))
-                conn.commit()
+                db.collection('categories').document(category_id).delete()
                 
                 return {
                     'statusCode': 200,
@@ -454,11 +458,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
         
         elif action == 'stats' and method == 'GET':
-            cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.torrents")
-            games_count = cur.fetchone()[0]
+            torrents_ref = db.collection('torrents').stream()
+            games_count = len(list(torrents_ref))
             
-            cur.execute("SELECT COUNT(*) FROM t_p88186320_torrent_game_platfor.users")
-            users_count = cur.fetchone()[0]
+            users_ref = db.collection('users').stream()
+            users_count = len(list(users_ref))
             
             stats = {
                 'games': games_count,
@@ -478,8 +482,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif action.startswith('users/') and method == 'DELETE':
             user_id = action.split('/')[-1]
-            cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.users WHERE id = %s", (user_id,))
-            conn.commit()
+            db.collection('users').document(user_id).delete()
             
             return {
                 'statusCode': 200,
@@ -489,28 +492,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 },
                 'isBase64Encoded': False,
                 'body': json.dumps({'success': True, 'message': 'Пользователь удален'})
-            }
-        
-        elif action == 'users' and method == 'GET':
-            cur.execute("SELECT id, username, created_at FROM t_p88186320_torrent_game_platfor.users ORDER BY created_at DESC")
-            rows = cur.fetchall()
-            users = []
-            for row in rows:
-                users.append({
-                    'id': row[0],
-                    'username': row[1],
-                    'email': '',
-                    'created_at': row[2].isoformat() if row[2] else None
-                })
-            
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'isBase64Encoded': False,
-                'body': json.dumps({'users': users})
             }
         
         elif method == 'DELETE':
@@ -526,8 +507,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Missing id parameter'})
                 }
             
-            cur.execute("DELETE FROM t_p88186320_torrent_game_platfor.torrents WHERE id = %s", (torrent_id,))
-            conn.commit()
+            db.collection('torrents').document(torrent_id).delete()
             
             return {
                 'statusCode': 200,
@@ -552,17 +532,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             categories = body_data.get('categories', [])
             description = body_data.get('description', '')
             steam_deck = body_data.get('steamDeck', False)
-            
-            print(f"PUT VALUES: title={title}, steam_deck={steam_deck}, categories={categories}")
-            
             steam_rating = body_data.get('steamRating')
             metacritic_score = body_data.get('metacriticScore')
             
-            cur.execute(
-                "UPDATE t_p88186320_torrent_game_platfor.torrents SET title = %s, poster = %s, downloads = %s, size = %s, category = %s, description = %s, steam_deck = %s, steam_rating = %s, metacritic_score = %s WHERE id = %s",
-                (title, poster, downloads, size, categories, description, steam_deck, steam_rating, metacritic_score, torrent_id)
-            )
-            conn.commit()
+            print(f"PUT VALUES: title={title}, steam_deck={steam_deck}, categories={categories}")
+            
+            db.collection('torrents').document(torrent_id).update({
+                'title': title,
+                'poster': poster,
+                'downloads': downloads,
+                'size': size,
+                'category': categories,
+                'description': description,
+                'steam_deck': steam_deck,
+                'steam_rating': steam_rating,
+                'metacritic_score': metacritic_score
+            })
             
             print(f"PUT SUCCESS: updated torrent {torrent_id}")
             
@@ -580,29 +565,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             category = event.get('queryStringParameters', {}).get('category') if event.get('queryStringParameters') else None
             
             if category:
-                cur.execute(
-                    "SELECT id, title, poster, downloads, size, category, description, steam_deck, steam_rating, metacritic_score FROM t_p88186320_torrent_game_platfor.torrents WHERE %s = ANY(category) ORDER BY downloads DESC",
-                    (category,)
-                )
+                torrents_ref = db.collection('torrents').where('category', 'array_contains', category).order_by('downloads', direction=firestore.Query.DESCENDING)
             else:
-                cur.execute(
-                    "SELECT id, title, poster, downloads, size, category, description, steam_deck, steam_rating, metacritic_score FROM t_p88186320_torrent_game_platfor.torrents ORDER BY downloads DESC"
-                )
+                torrents_ref = db.collection('torrents').order_by('downloads', direction=firestore.Query.DESCENDING)
             
-            rows = cur.fetchall()
+            torrents_docs = torrents_ref.stream()
+            
             torrents = []
-            for row in rows:
+            for doc in torrents_docs:
+                torrent_data = doc.to_dict()
                 torrents.append({
-                    'id': row[0],
-                    'title': row[1],
-                    'poster': row[2],
-                    'downloads': row[3],
-                    'size': float(row[4]),
-                    'category': row[5],
-                    'description': row[6],
-                    'steamDeck': bool(row[7]),
-                    'steamRating': row[8] if len(row) > 8 else None,
-                    'metacriticScore': row[9] if len(row) > 9 else None
+                    'id': doc.id,
+                    'title': torrent_data.get('title'),
+                    'poster': torrent_data.get('poster'),
+                    'downloads': torrent_data.get('downloads', 0),
+                    'size': float(torrent_data.get('size', 0)),
+                    'category': torrent_data.get('category', []),
+                    'description': torrent_data.get('description', ''),
+                    'steamDeck': bool(torrent_data.get('steam_deck', False)),
+                    'steamRating': torrent_data.get('steam_rating'),
+                    'metacriticScore': torrent_data.get('metacritic_score')
                 })
             
             return {
@@ -628,12 +610,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             steam_rating = body_data.get('steamRating')
             metacritic_score = body_data.get('metacriticScore')
             
-            cur.execute(
-                "INSERT INTO t_p88186320_torrent_game_platfor.torrents (title, poster, downloads, size, category, description, steam_deck, steam_rating, metacritic_score) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
-                (title, poster, downloads, size, categories, description, steam_deck, steam_rating, metacritic_score)
-            )
-            torrent_id = cur.fetchone()[0]
-            conn.commit()
+            doc_ref = db.collection('torrents').add({
+                'title': title,
+                'poster': poster,
+                'downloads': downloads,
+                'size': size,
+                'category': categories,
+                'description': description,
+                'steam_deck': steam_deck,
+                'steam_rating': steam_rating,
+                'metacritic_score': metacritic_score
+            })
+            torrent_id = doc_ref[1].id
             
             return {
                 'statusCode': 201,
@@ -661,10 +649,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     except Exception as e:
         print(f"ERROR: {str(e)}")
-        if 'cur' in locals():
-            cur.close()
-        if 'conn' in locals():
-            conn.close()
         return {
             'statusCode': 500,
             'headers': {
@@ -674,9 +658,3 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False,
             'body': json.dumps({'error': f'Internal server error: {str(e)}'})
         }
-    
-    finally:
-        if 'cur' in locals():
-            cur.close()
-        if 'conn' in locals():
-            conn.close()
