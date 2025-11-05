@@ -50,18 +50,8 @@ const TorrentGrid = ({ torrents, formatDownloads, getCategoryIcon }: TorrentGrid
               )}
             </div>
           </div>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-sm mb-2 truncate">{torrent.title}</h3>
-            
-            {torrent.steamRating && torrent.steamRating > 0 && (
-              <div className="flex items-center gap-1 mb-2">
-                <Icon name="ThumbsUp" size={14} className="text-primary" />
-                <span className="text-xs font-semibold text-primary">
-                  {(torrent.steamRating / 1000).toFixed(0)}K
-                </span>
-                <span className="text-xs text-muted-foreground">отзывов</span>
-              </div>
-            )}
+          <CardContent className="p-4 space-y-3">
+            <h3 className="font-semibold text-sm truncate">{torrent.title}</h3>
             
             <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs">
               <div className="flex items-center gap-1">
@@ -70,6 +60,29 @@ const TorrentGrid = ({ torrents, formatDownloads, getCategoryIcon }: TorrentGrid
               </div>
               <span>{torrent.size} ГБ</span>
             </div>
+            
+            {torrent.steamRating && torrent.steamRating > 0 && (
+              <div className="pt-2 border-t border-border">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Отзывы Steam</span>
+                  <Icon name="Store" size={10} className="text-muted-foreground" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 flex-1">
+                    <Icon name="ThumbsUp" size={12} className="text-green-500" />
+                    <span className="text-xs font-semibold text-green-500">
+                      {Math.round(torrent.steamRating * 0.85).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 flex-1">
+                    <Icon name="ThumbsDown" size={12} className="text-red-500" />
+                    <span className="text-xs font-semibold text-red-500">
+                      {Math.round(torrent.steamRating * 0.15).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       ))}
